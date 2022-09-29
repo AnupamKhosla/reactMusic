@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/git@github.com:AnupamKhosla/reactMusic.git/static/css/main.073c9b0a.css",
+    "main.js": "/git@github.com:AnupamKhosla/reactMusic.git/static/js/main.21559108.js",
+    "static/js/787.881ce8e8.chunk.js": "/git@github.com:AnupamKhosla/reactMusic.git/static/js/787.881ce8e8.chunk.js",
+    "static/media/logo.svg": "/git@github.com:AnupamKhosla/reactMusic.git/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/git@github.com:AnupamKhosla/reactMusic.git/index.html",
+    "main.073c9b0a.css.map": "/git@github.com:AnupamKhosla/reactMusic.git/static/css/main.073c9b0a.css.map",
+    "main.21559108.js.map": "/git@github.com:AnupamKhosla/reactMusic.git/static/js/main.21559108.js.map",
+    "787.881ce8e8.chunk.js.map": "/git@github.com:AnupamKhosla/reactMusic.git/static/js/787.881ce8e8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.21559108.js"
+  ]
+}
