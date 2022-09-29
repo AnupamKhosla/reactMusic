@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  var api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg";
   return (
     <div className="App">
       <header className="App-header">
