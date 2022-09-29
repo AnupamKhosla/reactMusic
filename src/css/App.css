@@ -1,0 +1,18 @@
+#root {
+  background-color: #fffcf7;  
+  --pm-color: #ff4f18;
+}
+
+
+
+/*Bulma overrrides*/
+.navbar-item img {
+  width:  auto;
+}
+
+.navbar-brand .logo-text {
+  margin-left:  0.5rem;
+  font-size:  24px;
+  font-weight: bold;
+  color: var(--pm-color);
+}
