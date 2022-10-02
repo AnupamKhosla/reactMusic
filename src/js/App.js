@@ -21,7 +21,7 @@ class App extends React.Component {
     };    
     this.channels = [];
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
-    this.deezer_query = "http://all.api.radio-browser.info/json/stations/bylanguage/";
+    this.deezer_query = "https://all.api.radio-browser.info/json/stations/bylanguage/";
     //fetch with cors
     fetch(this.deezer_query + this.state.searchString)
       .then(response => response.json())
