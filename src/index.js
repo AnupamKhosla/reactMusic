@@ -6,9 +6,9 @@ import { App3 } from './js/App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>    
-    <App3 />
-  </React.StrictMode>
+  
+    <App3 /> 
+  
 );
 
 

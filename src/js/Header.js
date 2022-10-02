@@ -12,7 +12,7 @@ class Header extends React.Component {
               width='112'
               height='28'
             />
-            <span className="logo-text">reactMusic</span>  
+            <span className="logo-text">reactRadio</span>  
           </a>
           <a
             role='button'

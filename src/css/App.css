@@ -9,10 +9,38 @@
 .navbar-item img {
   width:  auto;
 }
-
 .navbar-brand .logo-text {
   margin-left:  0.5rem;
   font-size:  24px;
   font-weight: bold;
   color: var(--pm-color);
+}
+.control.has-icons-left .icon,
+.control.has-icons-right .icon {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*Main css*/
+
+.main {
+  padding:  4rem 0 2rem;
+}
+.main .cards {
+  margin-top: 2rem;
 }
