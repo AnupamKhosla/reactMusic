@@ -1,11 +1,18 @@
 #root {
-  background-color: #fffcf7;  
+  background-color: #1a1919;  
   --pm-color: #ff4f18;
+  color:  white;
+}
+.wrap {
+  word-wrap: break-word;
 }
 
 
 
 /*Bulma overrrides*/
+.image.is-48x48 {
+  height:  auto;
+}
 .navbar-item img {
   width:  auto;
 }
@@ -19,9 +26,53 @@
 .control.has-icons-right .icon {
   pointer-events: auto;
   cursor: pointer;
+  color:  #d3c7c7;
+}
+.card {
+  background-color: #282626;
+  color: white;
+}
+.input,
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input[data-autocompleted] {
+  background-color: #282626;  
+  border-color: #3a3636;
+  color: #efe5e5;
+  transition: border-color .3s ease, background-color 999999s ease, color 999999s ease, font-size 999999s ease;
+}
+.input:hover {
+  border-color: #444040;
+}
+.input:focus {
+  border-color: #544f4f;
+  color: #efe5e5;
+  box-shadow: none;
+}
+
+.control.has-icons-right .input:focus ~ .icon {
+  color: #d3c7c7;
+  transition:  color .3s ease;
+}
+.control.has-icons-right .icon:focus {
+  color: #fff;
+}
+
+.control.has-icons-right .icon:focus-visible {
+  outline: 0;
+  color: #fff;
 }
 
 
+.control.has-icons-left,
+.content h1, 
+.content h2, 
+.content h3, 
+.content h4, 
+.content h5, 
+.content h6 {
+  color: white;
+}
 
 
 
@@ -37,10 +88,60 @@
 
 
 /*Main css*/
-
-.main {
-  padding:  4rem 0 2rem;
+#root {
+  min-height: 100vh;
 }
+
+.navbar {
+  background-color: #1a1919;
+}
+.logo-text, .headline {
+  font-family: 'Cinzel', sans-serif;
+}
+.main {
+  
+}
+.content .headline {
+  color: #ff4c18;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fa-spin {
+  animation: spin 1s infinite linear;
+}
+
+
+
+
+
+
+
+/*Cards*/
+
 .main .cards {
   margin-top: 2rem;
+}
+
+.item-enter {
+  opacity: 0;
+}
+.item-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+.item-exit {
+  opacity: 1;
+}
+.item-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}
+.content figure {
+  margin:  0;
 }

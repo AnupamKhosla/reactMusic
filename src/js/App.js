@@ -1,50 +1,70 @@
 import React, { useEffect, useState } from "react";
-//import { React } from "react";
 
+import "../css/font.css";
 import 'bulma/css/bulma.css';
 import '../css/App.css';
 
 import Header from './Header';
 import Search from './Search';
+import Cards from './Cards';
 
 import logo from '../images/musical-note.png';
 
 
-
-
 class App extends React.Component {
-
   constructor(props) {
     super(props);        
     this.state = {
-      searchString: "australia"      
+      searchString: "australia" ,
+      loading: true     
     };    
     this.channels = [];
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
-    this.deezer_query = "https://all.api.radio-browser.info/json/stations/bylanguage/";
+    this.deezer_query = "https://de1.api.radio-browser.info/json/stations/bycountry/";
     //fetch with cors
-    fetch(this.deezer_query + this.state.searchString)
+    fetch(this.deezer_query + this.state.searchString + "?limit=30")
       .then(response => response.json())
-      .then(data => {
-        //set state
-        //console.log(data[0]);
+      .then(data => {        
         this.channels = data || [];
-        this.setState({searchString: "australia"});
+        this.setState({
+          loading: false,
+          searchString: "australia"
+        });
       });   
-    
+    //set state if current state is different from previous state    
     this.onChangeState = this.onChangeState.bind(this);
+    this.onImgError = this.onImgError.bind(this);
+    console.log("app constructor");
   }
   onChangeState(value) {
-    let valueLowerCase = value.toLowerCase();
-    console.log(value);
-    fetch(this.deezer_query + valueLowerCase)
-      .then(response => response.json())
-      .then(data => {
-        //set state
-        //console.log(data[0]);
-        this.channels = data || [];
-        this.setState({searchString: valueLowerCase});
-      });       
+    let valueLowerCase = value.toLowerCase() || "australia"; //defualt us always Australia    
+    if(!this.state.loading && (valueLowerCase != this.state.searchString.toLowerCase())) {  // no change in state untill prev fetch is complete   
+      this.channels = [];
+      this.setState({
+          loading: true               
+      }); 
+
+      fetch(this.deezer_query + valueLowerCase + "?limit=30")
+        .then(response => response.json())
+        .then(data => {          
+          this.channels = data || [];          
+          this.setState({
+            loading: false,
+            searchString: valueLowerCase
+          });          
+        });         
+    }       
+  }
+
+  onImgError(e) {        
+    console.log(this.onImgError);
+    e.target.removeEventListener("onerror", this.onImgError);
+    console.log(e.target.onerror, e.target.onError);
+    //e.target.src = "http://www.noexist/fg.png";
+    var fallback = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
+    if(e.target.src != fallback) {
+      e.target.src = fallback;
+    }    
   }
   
 
@@ -53,70 +73,23 @@ class App extends React.Component {
   }
   
   render() {
+    console.log("app render"); 
     return (
       <>
         <Header />
         
-        <div className="main container"> 
-          <h1>
-            International radio app by <a href="#">Anupam Khosla</a>     
-          </h1>
-          <hr/>
-          <h2>Search for radio channels by country</h2>
-          <Search channels={this.channels} onChangeText={this.onChangeState}/>
-          <div className="cards columns is-multiline">
-            {
-              this.channels.map(
-              (channel, index) => 
-                  {
-                    var breakClass = "";
-                    if(index % 3 == 0) {
-                      breakClass = "test"
-                    }
-                    return ( 
-                      <div className={breakClass + " column is-one-third"} key={channel.changeuuid}>
-                        <div className="card">
-                          <div className="card-image">
-                            <figure className="image is-4by3">
-                              <img src={channel.favicon} alt="Placeholder image" />
-                            </figure>
-                          </div>
-                          <div className="card-content">
-                            <div className="media">
-                              <div className="media-left">
-                                <figure className="image is-48x48">
-                                  <img src={channel.favicon} alt="Placeholder image" />
-                                </figure>
-                              </div>
-                              <div className="media-content">
-                                <p className="title is-4">{channel.name}</p>
-                                <p className="subtitle is-6">
-                                  <a href={channel.homepage}>
-                                    Link
-                                  </a>
-                                </p>
-                              </div>
-                            </div>
-                            <div className="content">
-                              <pre>{JSON.stringify(channel)}</pre>
-                              <br />                    
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  }
-                
-              )
-            }
-          </div>
+        <div className="main container section"> 
+          <h1 className="has-text-centered headline">
+            FM Radio of the World
+          </h1>          
+          <Search channels={this.channels} onChangeText={this.onChangeState} loading={this.state.loading}/>
+          <Cards channels={this.channels}/>
+          {/* In future find a way to NOT UPDATE/RE_RENDER Cards when this.stateloading changes */}          
         </div> 
       </>
     )
   };
 }
-
-
 
 //export app2 without default
 export {App as App3};

@@ -1,10 +1,16 @@
-# Getting Started with Create React App
+# World Radio app by Anupam Khosla, based upon create-react-app
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
 
-In the project directory, you can run:
+## https://anupamkhosla.github.io/reactMusic/
+
+
+
+
+
+
+## Available Scripts
 
 ### `npm start`
 

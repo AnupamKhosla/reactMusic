@@ -3,7 +3,7 @@ import React from 'react';
 class Header extends React.Component {
   render (){
     return (      
-      <nav className='navbar' role='navigation' aria-label='main navigation'>
+      <nav className='navbar section' role='navigation' aria-label='main navigation'>
         <div className='navbar-brand'>
           <a href='/' className='navbar-item'>
             <img
