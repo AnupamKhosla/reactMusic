@@ -5,6 +5,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## https://anupamkhosla.github.io/reactMusic/
 
+`npm run deploy` for git pages
+
 
 
 
