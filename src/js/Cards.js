@@ -69,8 +69,9 @@ class Cards extends React.Component {
                           </p>
                           </div>
                         </div>
-                        <div className="content wrap">                                                    
-                            <audio controls src={channel.url_resolved} onPause={this.onAudioPause} onTimeUpdate={(e)=>{console.log(1)}}></audio>
+                        <div className="content wrap">     
+                            {/*preload none is important to force stop downloading data on pause event.*/}
+                            <audio preload="none" controls src={channel.url_resolved} onPause={this.onAudioPause} onTimeUpdate={(e)=>{console.log(1)}}></audio>
                             {/*<AudioPlayer                              
                               src={channel.url_resolved}
                               onPlay={e => console.log("onPlay")}

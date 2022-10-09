@@ -34,6 +34,7 @@ class App extends React.Component {
     //set state if current state is different from previous state    
     this.onChangeState = this.onChangeState.bind(this);
     this.onImgError = this.onImgError.bind(this);
+    this.onToggle = this.onToggle.bind(this);
     console.log("app constructor");
   }
   onChangeState(value) {
@@ -55,7 +56,6 @@ class App extends React.Component {
         });         
     }       
   }
-
   onImgError(e) {        
     console.log(this.onImgError);
     e.target.removeEventListener("onerror", this.onImgError);
@@ -66,10 +66,8 @@ class App extends React.Component {
       e.target.src = fallback;
     }    
   }
-  
+  onToggle(e){
 
-  componentDidMount() {
-    console.log("mounted");     
   }
   
   render() {
@@ -82,7 +80,7 @@ class App extends React.Component {
           <h1 className="has-text-centered headline">
             FM Radio of the World
           </h1>          
-          <Search channels={this.channels} onChangeText={this.onChangeState} loading={this.state.loading}/>
+          <Search channels={this.channels} onChangeText={this.onChangeState} loading={this.state.loading} onClickToggleState={this.onToggle}/>
           <Cards channels={this.channels}/>
           {/* In future find a way to NOT UPDATE/RE_RENDER Cards when this.stateloading changes */}          
         </div> 
