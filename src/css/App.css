@@ -24,8 +24,14 @@ a:hover, a:focus {
   color: #fff;
   text-decoration: none;
 }
-
-
+.button:focus:not(:active), .button.is-focused:not(:active) {
+    box-shadow: 0 0 0 0.125em #403838;
+}
+.input:active,
+.input:focus,
+.input:active:focus {
+  box-shadow: none;
+}
 
 
 /*cols*/
@@ -180,25 +186,29 @@ input[data-autocompleted] {
   position: relative;
 }
 .toggle-btns .button {
-  width: 100px;  
+  width: 140px;  
   color: #efe5e5;
 }
-.toggle-btns .active {
-  
+.main .toggle-btns.darken {  
+  background-color: #252424;
 }
 .toggle-btns .cover {
   background-color: #c94a25;
-  width: 100px;
+  width: 140px;
   border-radius: 50px;
   position: absolute;
   left: 0;
   height: 40px;
   transition: transform .3s ease;
-  transform: translateX(100px);
+  transform: translateX(140px);
 }
 .toggle-btns .cover.left {
   transform: translateX(0);
 }
+.toggle-btns.darken-active .cover { 
+  background-color: #b23d20;
+}
+
 
 
 

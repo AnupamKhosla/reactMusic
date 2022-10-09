@@ -12,6 +12,7 @@ class Search extends React.Component {
     this.onClickToggle = this.onClickToggle.bind(this);
     this.darkenBg = this.darkenBg.bind(this);
     this.normalBg = this.normalBg.bind(this);
+    this.disableLabel = this.disableLabel.bind(this);
   }
   applyInput(event) {    
     //get search input value
@@ -47,20 +48,33 @@ class Search extends React.Component {
       target.parentNode.classList.add("darken");
     }    
     else {
-      target.classList.add("darken");
-      target.parentNode.parentNode.classList.add("darken");
+      target.parentNode.classList.add("darken-active");     
     }
-    event.stopPropagation();
+    // event.stopPropagation();
   }
   normalBg(event) {
     //set background color of target to normal
-    
+    let target = event.target;
+    if(!target.classList.contains("active")) {
+      target.parentNode.classList.remove("darken");
+    }    
+    else {
+      target.parentNode.classList.remove("darken-active");
+    }
+  }
+  disableLabel(event) {    
+    event.preventDefault();    
+    //.3 seconds later focus in the input
+    setTimeout(() => {
+      document.getElementById("search").focus();
+    }
+    , 300); //300ms must be same as .3s transitions for the buttons   
   }
 
   render (){
     return (      
         <form onSubmit={this.handleSubmit}>
-          <label htmlFor="search" className="label toggle-btns">
+          <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>
             <span className="cover left"></span>
             <button type="button" className="button is-rounded is-ghost active left" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
               Country
