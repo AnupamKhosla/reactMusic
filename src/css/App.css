@@ -217,6 +217,13 @@ input[data-autocompleted] {
 
 /*Cards*/
 
+.error-msg h2 {
+  color: #ff4c18;
+  margin: 2rem 0;
+  text-align: center;
+  color: #ff4c18;
+}
+
 .main .cards {
   margin-top: 2rem;
 }
@@ -225,20 +232,23 @@ input[data-autocompleted] {
   font-size:  12px;
 }
 
-.cards .item-enter {
+
+.item-enter { /*react transition plugin general classes*/
   opacity: 0;
 }
-.cards .item-enter-active {
+.item-enter-active {
   opacity: 1;
-  transition: opacity 300ms ease-in;
+  transition: opacity 3000ms ease-in;
 }
-.cards .item-exit {
+.item-exit {
   opacity: 1;
 }
-.cards .item-exit-active {
+.item-exit-active {
   opacity: 0;
-  transition: opacity 300ms ease-in;
+  transition: opacity 3000ms ease-in;
 }
+
+
 .cards figure {
   margin:  0;
 }

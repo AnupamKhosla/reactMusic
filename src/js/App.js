@@ -15,61 +15,87 @@ class App extends React.Component {
   constructor(props) {
     super(props);        
     this.state = {
-      searchString: "australia" ,
-      loading: true     
+      loading: true,
+      error: false     
     };    
+    this.searchString = "australia";
+    this.filterString = "bycountry"; 
     this.channels = [];
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
-    this.deezer_query = "https://de1.api.radio-browser.info/json/stations/bycountry/";
+    this.deezer_query = "https://de1.api.radio-browser.info/json/stations/";
     //fetch with cors
-    fetch(this.deezer_query + this.state.searchString + "?limit=30")
-      .then(response => response.json())
+    fetch(this.deezer_query + this.filterString + "/" + this.searchString + "?limit=2")
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        this.setState({
+          error: true,
+          loading: false
+        });
+        throw new Error('Something went wrong');  
+      })
       .then(data => {        
         this.channels = data || [];
-        this.setState({
-          loading: false,
-          searchString: "australia"
-        });
+        this.setState( 
+          (prevState, props) => ({
+            loading: false
+          })
+        );
       });   
-    //set state if current state is different from previous state    
-    this.onChangeState = this.onChangeState.bind(this);
-    this.onImgError = this.onImgError.bind(this);
+      
+    this.onTriggerSearch = this.onTriggerSearch.bind(this);
     this.onToggle = this.onToggle.bind(this);
     console.log("app constructor");
   }
-  onChangeState(value) {
-    let valueLowerCase = value.toLowerCase() || "australia"; //defualt us always Australia    
-    if(!this.state.loading && (valueLowerCase != this.state.searchString.toLowerCase())) {  // no change in state untill prev fetch is complete   
+  onTriggerSearch(value) {
+    let fallbackString = (this.filterString == "bycountry" ? "australia" : "90.7");
+    let valueLowerCase = value.toLowerCase() || fallbackString; //if empty use fallback
+    if(!this.state.loading) {  // no change in state untill prev fetch is complete   
       this.channels = [];
-      this.setState({
-          loading: true               
-      }); 
-
-      fetch(this.deezer_query + valueLowerCase + "?limit=30")
-        .then(response => response.json())
-        .then(data => {          
-          this.channels = data || [];          
+      this.setState( 
+        (prevState, props) => ({
+          loading: true
+        })
+      ); //this will trigger re render, it will remove the existing cards.
+      
+      fetch(this.deezer_query + this.filterString + "/" + valueLowerCase + "?limit=2")
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          //set state error true and loading false          
           this.setState({
             loading: false,
-            searchString: valueLowerCase
-          });          
-        });         
-    }       
-  }
-  onImgError(e) {        
-    console.log(this.onImgError);
-    e.target.removeEventListener("onerror", this.onImgError);
-    console.log(e.target.onerror, e.target.onError);
-    //e.target.src = "http://www.noexist/fg.png";
-    var fallback = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
-    if(e.target.src != fallback) {
-      e.target.src = fallback;
-    }    
-  }
+            error: true
+          });
+          throw new Error('Something went wrong');  
+        })
+        .then(data => {          
+          this.channels = data || [];  
+          this.setState(
+            (prevState, props) => ({
+              loading: false
+            })
+          );
+        });          
+    }         
+  }       
   onToggle(e){
-
+    //if first button has class active, then change filterString state
+    if(e.target.classList.contains("left")) {
+      this.filterString = "bycountry";
+      console.log("bycountry");
+    }
+    else {
+      this.filterString = "byname";
+      console.log("byname");
+    }
+    //get search string value and trim whitespace
+    let value = document.querySelector("#search").value.trim();
+    this.onTriggerSearch(value);
   }
-  
+
   render() {
     console.log("app render"); 
     return (
@@ -80,8 +106,8 @@ class App extends React.Component {
           <h1 className="has-text-centered headline">
             FM Radio of the World
           </h1>          
-          <Search channels={this.channels} onChangeText={this.onChangeState} loading={this.state.loading} onClickToggleState={this.onToggle}/>
-          <Cards channels={this.channels}/>
+          <Search channels={this.channels} onChangeText={this.onTriggerSearch} loading={this.state.loading} onClickToggleState={this.onToggle}/>
+          {this.state.error ? <div className="error-msg"> <h2>Error Occured</h2> </div> : <Cards channels={this.channels} loading={this.state.loading} />}
           {/* In future find a way to NOT UPDATE/RE_RENDER Cards when this.stateloading changes */}          
         </div> 
       </>

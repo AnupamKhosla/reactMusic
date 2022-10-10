@@ -13,10 +13,11 @@ class Search extends React.Component {
     this.darkenBg = this.darkenBg.bind(this);
     this.normalBg = this.normalBg.bind(this);
     this.disableLabel = this.disableLabel.bind(this);
+
   }
   applyInput(event) {    
     //get search input value
-    let searchInputValue = document.getElementById("search").value;
+    let searchInputValue = document.getElementById("search").value.trim();
     this.props.onChangeText(searchInputValue);
   }
   handleSubmit(event) {
@@ -24,23 +25,29 @@ class Search extends React.Component {
     document.activeElement.blur();  //On mobile phone, otherwise the keyboard remains open    
     event.preventDefault();    //stop form submission
   }
-  onClickToggle(event) {
-    this.props.onClickToggleState();
-    //add active class on the clicked button
-    let btns = document.querySelectorAll(".toggle-btns button");
-    for(let i=0; i<btns.length; i++) {
-      btns[i].classList.remove("active");
-    }
-    event.target.classList.add("active");
-    //toggle class left on cover if not clicked on left
-    let cover = document.querySelector(".cover");
-    if(event.target.classList.contains("left")) {
-      cover.classList.add("left");
-    }
-    else {
-      cover.classList.remove("left");
-    }    
+  onClickToggle(event) {    
+    if(!this.props.loading && !event.target.classList.contains("active")) {
+      //add active class on the clicked button
+      let btns = document.querySelectorAll(".toggle-btns button");
+      for(let i=0; i<btns.length; i++) {
+        btns[i].classList.remove("active");
+      }
+      event.target.classList.add("active");
+      //toggle class left on cover if not clicked on left
+      let cover = document.querySelector(".cover");
+      if(event.target.classList.contains("left")) {
+        cover.classList.add("left");
+        document.getElementById("search").placeholder = "e.g. Australia";
+      }
+      else {
+        cover.classList.remove("left");
+        document.getElementById("search").placeholder = "e.g. 101.5 fm"
+      }  
+      this.props.onClickToggleState(event); 
+    } 
   }
+  
+
   darkenBg(event) {    
     //add class darken to .toggle-btns, if mouseenter on not active button
     let target = event.target;
@@ -73,23 +80,23 @@ class Search extends React.Component {
 
   render (){
     return (      
-        <form onSubmit={this.handleSubmit}>
-          <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>
-            <span className="cover left"></span>
-            <button type="button" className="button is-rounded is-ghost active left" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
-              Country
-            </button>
-            <button type="button" className="button is-rounded is-ghost" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
-              Channel
-            </button>            
-          </label>
-          <div className="control has-icons-right">
-            <input name="search" id="search" className="input is-large" type="text" placeholder="e.g. Australia" />            
-            <span tabIndex="0" className="icon is-medium is-right" onClick={this.applyInput} >              
-              {this.props.loading ? <FaSpinner className="fa-spin" /> : <FaSearch />}              
-            </span>
-          </div>
-        </form>
+      <form onSubmit={this.handleSubmit}>
+        <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>
+          <span className="cover left"></span>
+          <button type="button" className="button is-rounded is-ghost active left" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
+            Country
+          </button>
+          <button type="button" className="button is-rounded is-ghost" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
+            Channel
+          </button>            
+        </label>
+        <div className="control has-icons-right">
+          <input name="search" id="search" className="input is-large" type="text" placeholder="e.g. Australia" />            
+          <span tabIndex="0" className="icon is-medium is-right" onClick={this.applyInput} >              
+            {this.props.loading ? <FaSpinner className="fa-spin" /> : <FaSearch />}              
+          </span>
+        </div>
+      </form>
     )
   }
 }
