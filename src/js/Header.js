@@ -1,4 +1,8 @@
 import React from 'react';
+//import github icon from react icons
+import { FaGithub } from 'react-icons/fa';
+
+
 
 class Header extends React.Component {
   render (){
@@ -8,9 +12,7 @@ class Header extends React.Component {
           <a href='/' className='navbar-item'>
             <img
               src={require("../images/musical-note.png")}
-              alt='Logo'
-              width='112'
-              height='28'
+              alt='Logo'              
             />
             <span className="logo-text">reactRadio</span>  
           </a>
@@ -30,10 +32,10 @@ class Header extends React.Component {
           <div className='navbar-end'>
             <div className='navbar-item'>
               <a href='/' className='navbar-item'>
-                Home
+                Author
               </a>
               <a href='/' className='navbar-item'>
-                Documentation
+                 <FaGithub className="git-icon" /> &nbsp; Github
               </a>
             </div>
           </div>

@@ -1,11 +1,13 @@
 import React from 'react';
-import {  CSSTransition, TransitionGroup, SwitchTransition } from 'react-transition-group';
+import {  CSSTransition, SwitchTransition } from 'react-transition-group';
 
-import AudioPlayer from 'react-h5-audio-player';
-import 'react-h5-audio-player/lib/styles.css';
+// import AudioPlayer from 'react-h5-audio-player';
+// import 'react-h5-audio-player/lib/styles.css'; //use in future to customize audio player
 
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import song from '../songs/song.mp3';
+
+import Pagination from './Pagination';
 
 class Cards extends React.Component {
   constructor(props) {
@@ -52,7 +54,10 @@ class Cards extends React.Component {
                           (!this.props.loading && (this.props.channels.length == 0) ) ?  "No results found" : ""
                         }
                       </h2>
-                    </div>                               
+                    </div> 
+
+                    {(!this.props.loading && (this.props.channels.length !== 0) ) ? <Pagination></Pagination> : ""}  
+                    
                     {
                       this.props.channels.map(
                         (channel, index) => 

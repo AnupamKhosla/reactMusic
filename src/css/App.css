@@ -1,21 +1,25 @@
+/*Authored by Anupam khosla under license CC BY-SA 4.0*/
+
+
+/* Bulma overrrides -- components */
 #root {
   background-color: #1a1919;  
   --pm-color: #ff4f18;
-  color:  white;
+  --pm-color-dark: #c94a25;
+  --pm-text:  #e5e5e5;
+  --pm-text-light: #cfc8c6;
+  --pm-text-bright: #fff;
+  color:  var(--pm-text-bright);
 }
 .wrap {
   word-wrap: break-word;
 }
-
-
-
-/*Bulma overrrides*/
 a {
   color: #998c88;
 }
 
 a:hover, a:focus {
-  color: #cfc8c6;
+  color: var(--pm-text-light);
 }
 .button {
   transition: color .3s ease;
@@ -50,19 +54,6 @@ a:hover, a:focus {
 }
 
 
-/*nav*/
-.navbar-item img {
-  width:  auto;
-}
-.navbar-brand .logo-text {
-  margin-left:  0.5rem;
-  font-size:  24px;
-  font-weight: bold;
-  color: var(--pm-color);
-}
-
-
-
 
 /*cards*/
 .control.has-icons-left .icon,
@@ -73,7 +64,7 @@ a:hover, a:focus {
 }
 .card {
   background-color: #282626;
-  color: white;
+  color: var(--pm-text-bright);
   height: 100%;
 }
 
@@ -155,9 +146,26 @@ input[data-autocompleted] {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*Main css*/
 #root {
   min-height: 100vh;
+}
+
+body {
+  font-size: 1rem;
 }
 
 .navbar {
@@ -166,6 +174,37 @@ input[data-autocompleted] {
 .logo-text, .headline {
   font-family: 'Cinzel', sans-serif;
 }
+/*nav*/
+.navbar-brand img {
+  width: 35px;
+  height: auto;
+  max-height: none;
+}
+.navbar-brand .logo-text {
+  margin-left:  0.5rem;
+  font-size:  24px;
+  font-weight: bold;
+  color: var(--pm-color);
+}
+.navbar-item, .navbar-link {
+  color:  var(--pm-text-light);
+  font-size: 1.125rem;
+}
+.navbar-menu .navbar-item {
+  margin-left: 1rem;
+}
+a.navbar-item:hover {
+  background-color: transparent;
+  color: var(--pm-text);
+}
+
+
+
+
+
+
+
+
 .main {
   
 }
@@ -216,6 +255,40 @@ input[data-autocompleted] {
 }
 .toggle-btns.darken-active .cover { 
   background-color: #b23d20;
+}
+
+
+/*Pagination*/
+.pagination {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+.pagination .pagination-list {
+  margin: 0;
+}
+.pagination-list li + li {
+  margin: 0;
+}
+.pagination-previous, .pagination-next, .pagination-link {
+  border-color: #3a3636;
+  background-color: #282626;
+  color: var(--pm-text-light);
+}
+.pagination-previous:hover, .pagination-next:hover, .pagination-link:hover,
+.pagination-previous:focus, .pagination-next:focus, .pagination-link:focus {
+  color: var(--pm-text-bright);
+  border-color: #544f4f;
+}
+.pagination-link.is-current {
+  background-color: var(--pm-color-dark);
+  border-color: var(--pm-color-dark); 
+  color: var(--pm-text);
+}
+.pagination-link.is-current:hover, .pagination-link.is-current:focus {
+  background-color: var(--pm-color);
+  border-color: var(--pm-color); 
+  color: var(--pm-text-bright);
 }
 
 

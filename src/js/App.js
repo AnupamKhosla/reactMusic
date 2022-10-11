@@ -1,3 +1,5 @@
+// Authored by Anupam khosla under license CC BY-SA 4.0
+
 import React, { useEffect, useState } from "react";
 
 import "../css/font.css";
