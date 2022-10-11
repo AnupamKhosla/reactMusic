@@ -15,16 +15,16 @@ class App extends React.Component {
   constructor(props) {
     super(props);        
     this.state = {
-      loading: true,
-      error: false     
+      loading: true, //this is changed to trigger re render after fetch loading is complete
+      error: false   // in case fetch gives 404 etc, change this to trigger re render with error msg  
     };    
-    this.searchString = "australia";
-    this.filterString = "bycountry"; 
+    this.searchString = "australia"; //default value of search input
+    this.filterString = "bycountry"; //default value of toggle buttons
     this.channels = [];
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
-    this.deezer_query = "https://de1.api.radio-browser.info/json/stations/";
+    this.radio_query = "https://de1.api.radio-browser.info/json/stations/";
     //fetch with cors
-    fetch(this.deezer_query + this.filterString + "/" + this.searchString + "?limit=2")
+    fetch(this.radio_query + this.filterString + "/" + this.searchString + "?limit=12")
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -51,7 +51,8 @@ class App extends React.Component {
   onTriggerSearch(value) {
     let fallbackString = (this.filterString == "bycountry" ? "australia" : "90.7");
     let valueLowerCase = value.toLowerCase() || fallbackString; //if empty use fallback
-    if(!this.state.loading) {  // no change in state untill prev fetch is complete   
+    if(!this.state.loading && (this.searchString != valueLowerCase) ) {  // no change in state untill prev fetch is complete  
+      this.searchString = valueLowerCase; 
       this.channels = [];
       this.setState( 
         (prevState, props) => ({
@@ -59,7 +60,7 @@ class App extends React.Component {
         })
       ); //this will trigger re render, it will remove the existing cards.
       
-      fetch(this.deezer_query + this.filterString + "/" + valueLowerCase + "?limit=2")
+      fetch(this.radio_query + this.filterString + "/" + valueLowerCase + "?limit=12")
         .then(response => {
           if (response.ok) {
             return response.json();
@@ -85,15 +86,14 @@ class App extends React.Component {
     //if first button has class active, then change filterString state
     if(e.target.classList.contains("left")) {
       this.filterString = "bycountry";
-      console.log("bycountry");
     }
     else {
       this.filterString = "byname";
-      console.log("byname");
     }
     //get search string value and trim whitespace
     let value = document.querySelector("#search").value.trim();
-    this.onTriggerSearch(value);
+    this.searchString = value + "makeDifferentFromValue"; //makes react think that new search string is given on every toggle
+    this.onTriggerSearch(value); // value !== searchString
   }
 
   render() {

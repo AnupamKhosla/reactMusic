@@ -37,96 +37,83 @@ class Cards extends React.Component {
     console.log(this.props.loading)
     return (
       <>
-        <TransitionGroup className="cards columns is-multiline">     
-          {
-            //if channels is not empty
-            (!this.props.loading && (this.props.channels.length == 0) ) ? 
-              <CSSTransition
-                key="intentionalayImmuttable1093758"  //If we keep the key same across all renders, transitions work smoothly
-                timeout={3000}
-                classNames="item"
-              >
-                <div>
-                  No results found
-                </div>
-              </CSSTransition> :  
-
-              this.props.channels.map(
-                (channel, index) => 
-                  {
-                    var breakClass = "";
-                    if(index % 3 == 0) {
-                      breakClass = "test"
-                    }
-                    return ( 
-                      <CSSTransition
-                          key={index} // intentionally not using channel.id. we need keys to be seem on every re-render,
-                          // so that transition doesn't add new elements on top of exisiting ones.
-                          // With same keys react thinks that it is the same element, so rather than adding new elements, it removes the existing and adds them back again.                 
-                          timeout={3000}
-                          classNames="item"
-                        >
-                        <div className={breakClass + " column is-one-third-desktop is-half-tablet"}>
-                          <div className="card">                          
-                            <div className="card-content">
-                              <div className="media">
-                                <div className="media-left">
-                                  <figure className="image is-48x48">
-                                    <img  src={channel.favicon ? channel.favicon : "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="} 
-                                    alt="channel logo"
-                                    onError={this.onImgError}
-
-                                    />
-                                    </figure>
-                                  </div>
-                                <div className="media-content">
-                                <h2 className="title is-5">{channel.name}</h2>
-                                <p className="subtitle is-6">
-                                  <a href={channel.homepage}>
-                                    Official Website <FaExternalLinkAlt className="ext-link" />
-                                  </a>
-                                </p>
-                                </div>
-                              </div>
-                              <div className="content wrap">     
-                                  {/*preload none is important to force stop downloading data on pause event.*/}
-                                  <audio preload="none" controls src={channel.url_resolved} onPause={this.onAudioPause} ></audio>
-                                  {/*<AudioPlayer                              
-                                    src={channel.url_resolved}
-                                    onPlay={e => console.log("onPlay")}
-                                    // other props here
-                                  />*/}
-                                {/*Customizable audio tag, but backwardf/forward functionality not working*/}                          
-                                <p>Tags: {channel.tags.replaceAll(',', ', ')}</p>
-                                <p>Country: {channel.country}</p>
-                                <p>Country Code: {channel.countrycode}</p>
-                                <p>State: {channel.state}</p>
-                                <p>Language: {channel.language.replaceAll(',', ', ')}</p>  
-                                <p>Codec: {channel.codec}</p>
-                                {/*{JSON.stringify(channel)}*/}
-                                                  
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CSSTransition>
-                    )
-                  }
-              )
-          }
-        </TransitionGroup>
-
-        <SwitchTransition mode="out-in" className="cards">
+        <SwitchTransition mode='out-in' >  
           <CSSTransition
-            key={this.props.loading}
-            timeout={3000}
-            classNames="item"
-          >
-            <div className="loading">
-              {this.props.loading ? "Loading..." : "not loading"}
-            </div>
+                key={new Date().getTime() + Math.random()} // This will make sure that the key is changed on every render.
+                // r-t-g plugin thinks that new elements have been added, so the transitions kick in.
+                // With same keys react thinks that it is the same element, so nothing is added or removed, disallowing transition classes to be added/removed as well.
+                timeout={300} // same as .3s transitions in css
+                classNames="item"
+              > 
+                  <div className="cards columns is-multiline">                              
+                    <div className="no-results column is-full p-0">
+                      <h2>  
+                        { //if loading finished and no results found
+                          (!this.props.loading && (this.props.channels.length == 0) ) ?  "No results found" : ""
+                        }
+                      </h2>
+                    </div>                               
+                    {
+                      this.props.channels.map(
+                        (channel, index) => 
+                          {
+                            var breakClass = "";
+                            if(index % 3 == 0) {
+                              breakClass = "test"
+                            }
+                            return (                       
+                                <div key={channel.changeuuid} className={breakClass + " column is-one-third-desktop is-half-tablet"}>
+                                  <div className="card">                          
+                                    <div className="card-content">
+                                      <div className="media">
+                                        <div className="media-left">
+                                          <figure className="image is-48x48">
+                                            <img  src={channel.favicon ? channel.favicon : "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="} 
+                                            alt="channel logo"
+                                            onError={this.onImgError}
+
+                                            />
+                                            </figure>
+                                          </div>
+                                        <div className="media-content">
+                                        <h2 className="title is-5">{channel.name}</h2>
+                                        <p className="subtitle is-6">
+                                          <a href={channel.homepage}>
+                                            Official Website <FaExternalLinkAlt className="ext-link" />
+                                          </a>
+                                        </p>
+                                        </div>
+                                      </div>
+                                      <div className="content wrap">     
+                                          {/*preload none is important to force stop downloading data on pause event.*/}
+                                          <audio preload="none" controls src={channel.url_resolved} onPause={this.onAudioPause} ></audio>
+                                          {/*<AudioPlayer                              
+                                            src={channel.url_resolved}
+                                            onPlay={e => console.log("onPlay")}
+                                            // other props here
+                                          />*/}
+                                        {/*Customizable audio tag, but backwardf/forward functionality not working*/}                          
+                                        <p>Tags: {channel.tags.replaceAll(',', ', ')}</p>
+                                        <p>Country: {channel.country}</p>
+                                        <p>Country Code: {channel.countrycode}</p>
+                                        <p>State: {channel.state}</p>
+                                        <p>Language: {channel.language.replaceAll(',', ', ')}</p>  
+                                        <p>Codec: {channel.codec}</p>
+                                        {/*{JSON.stringify(channel)}*/}
+                                                          
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>                      
+                            )
+                          }
+                      )
+                    }                          
+                  </div>
           </CSSTransition>
         </SwitchTransition>
+        
+        
       </>
     )
   }

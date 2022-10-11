@@ -31,6 +31,11 @@ a:hover, a:focus {
 .input:focus,
 .input:active:focus {
   box-shadow: none;
+  
+}
+.input:active {
+  /*Wierd bug; mousdown on label and move out of label will change the border color of input, triggering active state*/
+  /*border-color has been applied to override this bug on line 117 */
 }
 
 
@@ -78,12 +83,16 @@ a:hover, a:focus {
 }
 .control.has-icons-right .icon:focus {
   color: #fff;
-}
-
-.control.has-icons-right .icon:focus-visible {
   outline: 0;
+}
+.control.has-icons-right .icon:focus-visible {  
+  outline: 1px solid #efe5e5;
   color: #fff;
 }
+#search:focus + .icon {
+  color: #fff;
+}
+
 
 
 
@@ -105,7 +114,7 @@ input[data-autocompleted] {
   color: #efe5e5;
   transition: border-color .3s ease, background-color 999999s ease, color 999999s ease, font-size 999999s ease;
 }
-.input:hover {
+.input:hover, .input:active {
   border-color: #444040;
 }
 .input:focus {
@@ -217,11 +226,12 @@ input[data-autocompleted] {
 
 /*Cards*/
 
-.error-msg h2 {
-  color: #ff4c18;
-  margin: 2rem 0;
+.no-results h2 {  
   text-align: center;
-  color: #ff4c18;
+  color: #efe5e5;
+  margin: 0;
+  position: relative;
+  bottom: -12px; /*same as padding top of card*/  
 }
 
 .main .cards {
@@ -238,14 +248,14 @@ input[data-autocompleted] {
 }
 .item-enter-active {
   opacity: 1;
-  transition: opacity 3000ms ease-in;
+  transition: opacity 300ms ease-in;
 }
 .item-exit {
   opacity: 1;
 }
 .item-exit-active {
   opacity: 0;
-  transition: opacity 3000ms ease-in;
+  transition: opacity 300ms ease-in;
 }
 
 
