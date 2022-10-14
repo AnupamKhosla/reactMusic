@@ -197,6 +197,16 @@ a.navbar-item:hover {
   background-color: transparent;
   color: var(--pm-text);
 }
+a.navbar-item:focus {
+  background-color: transparent;
+  color: var(--pm-text);
+}
+.navbar-burger span {
+  background-color: var(--pm-text-bright);
+}
+/*.navbar-burger.is-active span {
+  background-color: var(--pm-text-bright);
+}*/
 
 
 
@@ -353,4 +363,27 @@ a.navbar-item:hover {
 }
 .cards audio::-webkit-media-controls-time-remaining-display {
   text-shadow: none;
+}
+
+
+
+
+
+
+@media screen and (max-width: 1023px) {
+  .navbar {
+    padding-top:  2rem;
+  }
+  .navbar-menu {
+    margin: 1rem -1.5rem 0;
+    background-color: #c94a25;
+  }
+  .navbar-end {
+    padding-left: 0.75rem;
+  }
+  .navbar-item {
+    align-items: center;
+    display: flex;
+    color: var(--pm-text-bright);
+  }
 }

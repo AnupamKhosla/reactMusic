@@ -56,7 +56,7 @@ class Cards extends React.Component {
                       </h2>
                     </div> 
 
-                    {(!this.props.loading && (this.props.channels.length !== 0) ) ? <Pagination></Pagination> : ""}  
+                    {(!this.props.loading && (this.props.channels.length !== 0) ) ? <Pagination onPageChange={this.props.onPageChange}/> : ""}  
                     
                     {
                       this.props.channels.map(
