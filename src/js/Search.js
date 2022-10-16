@@ -6,22 +6,17 @@ import { FaSpinner } from 'react-icons/fa';
 
 class Search extends React.Component {
   constructor(props) {
-    super(props);
-    this.applyInput = this.applyInput.bind(this);
+    super(props);    
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onClickToggle = this.onClickToggle.bind(this);
     this.darkenBg = this.darkenBg.bind(this);
     this.normalBg = this.normalBg.bind(this);
     this.disableLabel = this.disableLabel.bind(this);
-
   }
-  applyInput(event) {    
-    //get search input value
-    let searchInputValue = document.getElementById("search").value.trim();
-    this.props.onChangeText(searchInputValue);
-  }
-  handleSubmit(event) {
-    this.applyInput();
+  
+  handleSubmit(event) {    
+    let searchInputValue = document.getElementById("search").value.trim();    
+    this.props.onChangeText(searchInputValue, event);
     document.activeElement.blur();  //On mobile phone, otherwise the keyboard remains open    
     event.preventDefault();    //stop form submission
   }
@@ -80,7 +75,7 @@ class Search extends React.Component {
 
   render (){
     return (      
-      <form onSubmit={this.handleSubmit}>
+      <form id="searchForm" onSubmit={this.handleSubmit}>
         <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>
           <span className="cover left"></span>
           <button type="button" className="button is-rounded is-ghost active left" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
@@ -92,7 +87,7 @@ class Search extends React.Component {
         </label>
         <div className="control has-icons-right">
           <input name="search" id="search" className="input is-large" type="text" placeholder="e.g. Australia" />            
-          <span tabIndex="0" className="icon is-medium is-right" onClick={this.applyInput} >              
+          <span tabIndex="0" className="icon is-medium is-right" onClick={() => document.getElementById("searchForm").requestSubmit()} >              
             {this.props.loading ? <FaSpinner className="fa-spin" /> : <FaSearch />}              
           </span>
         </div>

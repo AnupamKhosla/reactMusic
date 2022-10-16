@@ -3,12 +3,18 @@
 
 /* Bulma overrrides -- components */
 #root {
-  background-color: #1a1919;  
+  --pm-bg-x-dark: #1a1919;
+  --pm-bg-dark: #3a3636;
+  --pm-bg-s-dark: #222020;
+  --pm-bg: #282626;
+  --pm-bg-light: #423e3e;
   --pm-color: #ff4f18;
   --pm-color-dark: #c94a25;
+  --pm-color-x-dark: #b23d20;
   --pm-text:  #e5e5e5;
   --pm-text-light: #cfc8c6;
-  --pm-text-bright: #fff;
+  --pm-text-bright: #fff;  
+  background-color: var(--pm-bg-x-dark);
   color:  var(--pm-text-bright);
 }
 .wrap {
@@ -101,7 +107,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:focus,
 input[data-autocompleted] {
   background-color: #282626;  
-  border-color: #3a3636;
+  border-color: var(--pm-bg-dark);
   color: #efe5e5;
   transition: border-color .3s ease, background-color 999999s ease, color 999999s ease, font-size 999999s ease;
 }
@@ -169,7 +175,7 @@ body {
 }
 
 .navbar {
-  background-color: #1a1919;
+  background-color: var(--pm-bg-x-dark);
 }
 .logo-text, .headline {
   font-family: 'Cinzel', sans-serif;
@@ -264,7 +270,7 @@ a.navbar-item:focus {
   transform: translateX(0);
 }
 .toggle-btns.darken-active .cover { 
-  background-color: #b23d20;
+  background-color: var(--pm-color-x-dark);
 }
 
 
@@ -276,6 +282,7 @@ a.navbar-item:focus {
 }
 .pagination .pagination-list {
   margin: 0;
+  flex-grow: 0;
 }
 .pagination-list li + li {
   margin: 0;
@@ -296,9 +303,25 @@ a.navbar-item:focus {
   color: var(--pm-text);
 }
 .pagination-link.is-current:hover, .pagination-link.is-current:focus {
-  background-color: var(--pm-color);
-  border-color: var(--pm-color); 
+  background-color: var(--pm-color-x-dark);
+  border-color: var(--pm-color-x-dark); 
   color: var(--pm-text-bright);
+}
+
+
+
+@keyframes loading {
+  0% {
+    background-color: var(--pm-bg);
+  }
+  100% {
+    background-color: var(--pm-bg-s-dark);
+  }
+}
+
+.animate-loading {
+  animation: loading .6s infinite linear alternate;  
+  min-width: 40vw;
 }
 
 
@@ -319,6 +342,7 @@ a.navbar-item:focus {
 
 .main .cards {
   margin-top: 2rem;
+  align-content: flex-start;
 }
 
 .cards .ext-link {
@@ -341,7 +365,9 @@ a.navbar-item:focus {
   transition: opacity 300ms ease-in;
 }
 
-
+.main .cards {
+  min-height: 100vh;
+}
 .cards figure {
   margin:  0;
 }
@@ -385,5 +411,11 @@ a.navbar-item:focus {
     align-items: center;
     display: flex;
     color: var(--pm-text-bright);
+  }
+}
+
+@media screen and (max-width:  767.8px) {
+  .main.section {
+    padding:  3rem 1rem;
   }
 }

@@ -35,8 +35,8 @@ class Cards extends React.Component {
   }
 
   render (){    
-    console.log("cards render");
-    console.log(this.props.loading)
+    console.log("cards render");    
+    // console.log(this.props.offSet);    
     return (
       <>
         <SwitchTransition mode='out-in' >  
@@ -56,7 +56,18 @@ class Cards extends React.Component {
                       </h2>
                     </div> 
 
-                    {(!this.props.loading && (this.props.channels.length !== 0) ) ? <Pagination onPageChange={this.props.onPageChange}/> : ""}  
+                    {
+                      (!this.props.loading && (this.props.channels.length !== 0) )
+                        ? <Pagination
+                            onPageChange={this.props.onPageChange}                             
+                            currentPage={this.props.currentPage}
+                            fullQuery={this.props.fullQuery}
+                            offSet={this.props.offSet}
+                            totalChannels={this.props.totalChannels}
+                            onTotalChannelChange={this.props.onTotalChannelChange}
+                            /> 
+                        : ""
+                    }  
                     
                     {
                       this.props.channels.map(
@@ -116,9 +127,7 @@ class Cards extends React.Component {
                     }                          
                   </div>
           </CSSTransition>
-        </SwitchTransition>
-        
-        
+        </SwitchTransition>        
       </>
     )
   }
