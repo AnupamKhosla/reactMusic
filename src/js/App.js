@@ -93,6 +93,8 @@ class App extends React.Component {
         })
         .then(data => {          
           this.channels = data || [];  
+          //set url
+          window.history.pushState({}, "", "/?search=" + valueLowerCase + "&filter=" + this.filterString);        
           this.setState(
             (prevState, props) => ({
               loading: false
@@ -153,7 +155,7 @@ class App extends React.Component {
               offSet={this.offset}     
               onTotalChannelChange={this.onTotalChannelChange} 
               totalChannels={this.totalChannels} 
-              />
+            />
           }
           {/* In future find a way to NOT UPDATE/RE_RENDER Cards when this.stateloading changes */}          
         </div> 

@@ -11,7 +11,7 @@ class Pagination extends React.Component{
       error: false
     }
        
-    if(!this.props.offSet) { //offset 0 means new pagination should be created
+    if(!this.props.totalChannels) { //totalChannels 0 means new pagination should be created
       fetch(this.props.fullQuery)
         .then(response => {
           if (response.ok) {
@@ -38,6 +38,7 @@ class Pagination extends React.Component{
   onPageLinkClick(e) {
     this.props.onPageChange(e);
     e.stopPropagation();
+    e.preventDefault();
   }
   onTotalChannelChange() {
 
@@ -59,37 +60,37 @@ class Pagination extends React.Component{
 
 
       if(currentPage > 1) {
-        prevPage = <a className="pagination-previous" href="#" onClick={this.onPageLinkClick} data-page={currentPage-1}>Previous</a>;
+        prevPage = <a className="pagination-previous" href={"?page=" + (currentPage-1)} onClick={this.onPageLinkClick} data-page={currentPage-1}>Previous</a>;
       }
       if(currentPage < totalPages) {
-        nextPage = <a className="pagination-next" href="#" onClick={this.onPageLinkClick} data-page={currentPage+1}>Next</a>;
+        nextPage = <a className="pagination-next" href={"?page=" + (currentPage+1)} onClick={this.onPageLinkClick} data-page={currentPage+1}>Next</a>;
       }
       if(totalPages <= 7) { //if 7 or less elemetns then no ... shown
         for(let i=1; i<=totalPages; i++) {
-          paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == i ? " is-current" : "")} href="#" onClick={this.onPageLinkClick} data-page={i}>{i}</a></li>;
+          paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == i ? " is-current" : "")} href={"?page=" + (currentPage+1)} onClick={this.onPageLinkClick} data-page={i}>{i}</a></li>;
         }
       } else { // if 8 or more pages
         if(currentPage <= 3) { //first ... not shown
           for(let i=1; i<=5; i++) { //P12345*LN
-            paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == i ? " is-current" : "")} href="#" onClick={this.onPageLinkClick} data-page={i}>{i}</a></li>;
+            paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == i ? " is-current" : "")} href={"?page=" + i} onClick={this.onPageLinkClick} data-page={i}>{i}</a></li>;
           }
           paginationLinks[6] = <li key={6} className="page-item disabled"><span className="pagination-link">...</span></li>;
-          paginationLinks[7] = <li key={7} ><a className="pagination-link" href="#" onClick={this.onPageLinkClick} data-page={totalPages}>{totalPages}</a></li>;
+          paginationLinks[7] = <li key={7} ><a className="pagination-link" href={"?page=" + totalPages} onClick={this.onPageLinkClick} data-page={totalPages}>{totalPages}</a></li>;
         } 
         else if(currentPage > 3 && currentPage < totalPages-2) { // show both ...
-          paginationLinks[1] = <li key={1} ><a className="pagination-link" href="#" onClick={this.onPageLinkClick} data-page="1">1</a></li>;
+          paginationLinks[1] = <li key={1} ><a className="pagination-link" href="?page=1" onClick={this.onPageLinkClick} data-page="1">1</a></li>;
           paginationLinks[2] = <li key={2} className="page-item disabled"><span className="pagination-link">...</span></li>;        
           for(let pageCount=currentPage-1, i=3; pageCount<=currentPage+1; pageCount++, i++) { //P1...345...LN
-            paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == pageCount ? " is-current" : "")} href="#" onClick={this.onPageLinkClick} data-page={pageCount}>{pageCount}</a></li>;
+            paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == pageCount ? " is-current" : "")} href={"?page=" + pageCount} onClick={this.onPageLinkClick} data-page={pageCount}>{pageCount}</a></li>;
           }
           paginationLinks[6] = <li key={6} className="page-item disabled"><span className="pagination-link">...</span></li>;
-          paginationLinks[7] = <li key={7} ><a className="pagination-link" href="#" onClick={this.onPageLinkClick} data-page={totalPages}>{totalPages}</a></li>;
+          paginationLinks[7] = <li key={7} ><a className="pagination-link" href={"?page=" + totalPages} onClick={this.onPageLinkClick} data-page={totalPages}>{totalPages}</a></li>;
         } 
         else { // show only first ... P1...6789XN
-          paginationLinks[1] = <li key={1} ><a className="pagination-link" href="#" onClick={this.onPageLinkClick} data-page="1">1</a></li>;
+          paginationLinks[1] = <li key={1} ><a className="pagination-link" href="?page=1" onClick={this.onPageLinkClick} data-page="1">1</a></li>;
           paginationLinks[2] = <li key={2} className="page-item disabled"><span className="pagination-link">...</span></li>;        
           for(let pageCount=totalPages-4, i=3; pageCount<=totalPages; pageCount++, i++) {
-            paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == pageCount ? " is-current" : "")} href="#" onClick={this.onPageLinkClick} data-page={pageCount}>{pageCount}</a></li>;
+            paginationLinks[i] = <li key={i}><a className={"pagination-link" + (currentPage == pageCount ? " is-current" : "")} href={"?page=" + pageCount} onClick={this.onPageLinkClick} data-page={pageCount}>{pageCount}</a></li>;
           }
         }
       }

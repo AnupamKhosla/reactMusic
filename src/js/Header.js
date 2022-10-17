@@ -46,10 +46,10 @@ class Header extends React.Component {
         </div>
         <div id='navbarBasicExample' className='navbar-menu'>
           <div className='navbar-end'>            
-            <a href='/' className='navbar-item'>
+            <a href='https://www.linkedin.com/in/anupamkhosla/' className='navbar-item'>
               Author
             </a>
-            <a href='/' className='navbar-item'>
+            <a href='https://github.com/AnupamKhosla/reactMusic/tree/master' className='navbar-item'>
                <FaGithub className="git-icon" /> &nbsp; Github
             </a>            
           </div>
