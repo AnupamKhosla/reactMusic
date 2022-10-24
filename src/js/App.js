@@ -20,16 +20,29 @@ class App extends React.Component {
       loading: true, //this is changed to trigger re render after fetch loading is complete      
       error: false,   // in case fetch gives 404 etc, change this to trigger re render with error msg        
     };    
-    this.searchString = "australia"; //default value of search input
-    this.filterString = "bycountry"; //default value of toggle buttons
+
     
-    this.offset = 0 // for pagination, change by 12 every page, same as limit
+    this.FreshSearch(); //execute brand new search based upon url params    
+
+    this.onTriggerSearch = this.onTriggerSearch.bind(this);
+    this.onToggle = this.onToggle.bind(this);
+    this.onPageChange = this.onPageChange.bind(this);
+    this.onTotalChannelChange = this.onTotalChannelChange.bind(this);
+    console.log("app constructor");
+  }
+
+  FreshSearch() { //execute brand new search based upon url params    
+    let urlParams = new URLSearchParams(window.location.search);
+    this.searchString = urlParams.get("search") || "australia"; //default value of search input
+    this.filterString = urlParams.get("filter") || "bycountry"; //default value of toggle buttons    
+    this.offset = ((urlParams.get("page")-1)*12) || 0 // for pagination, change by 12 every page, same as limit. page1 == offset0, page2==offset12
     this.channels = [];
     this.totalChannels = 0;
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
     this.radio_query = "https://de1.api.radio-browser.info/json/stations/";
     this.full_query = this.radio_query + this.filterString + "/" + this.searchString;
     //fetch with cors
+    console.log(this.full_query + "?limit=12" + "&offset=" + this.offset);
     fetch(this.full_query + "?limit=12" + "&offset=" + this.offset)
       .then(response => {
         if (response.ok) {
@@ -49,14 +62,12 @@ class App extends React.Component {
           })
         );
       });       
-
-    this.onTriggerSearch = this.onTriggerSearch.bind(this);
-    this.onToggle = this.onToggle.bind(this);
-    this.onPageChange = this.onPageChange.bind(this);
-    this.onTotalChannelChange = this.onTotalChannelChange.bind(this);
-    console.log("app constructor");
   }
-  onTriggerSearch(value, event = undefined) { //use this when search results need to update on re render    
+
+
+
+  onTriggerSearch(value, event = undefined) { //when search icon is clicked or form is submitted with "enter"
+    //use this when search results need to update on re render    
     console.log(event.currentTarget.tagName);
     if(!event.target.classList.value.includes("pagination")) { //not from pagination
     //for new searches, create new pagination and start from page 1
@@ -66,7 +77,8 @@ class App extends React.Component {
     }
     else { //this happens on pagination click        
       //set this.offset to data value of event.currentTarget
-      this.offset = (event.currentTarget.dataset.page - 1) * 12;      
+      this.offset = (event.currentTarget.dataset.page - 1) * 12; 
+      //offset 12 means result starts from 13th     
     }
     let fallbackString = (this.filterString == "bycountry" ? "australia" : "90.7");
     let valueLowerCase = value.toLowerCase() || fallbackString; //if empty use fallback
@@ -94,7 +106,7 @@ class App extends React.Component {
         .then(data => {          
           this.channels = data || [];  
           //set url
-          window.history.pushState({}, "", "/?search=" + valueLowerCase + "&filter=" + this.filterString);        
+          window.history.pushState({}, "", "/?search=" + valueLowerCase + "&filter=" + this.filterString + "&page=" + (this.offset/12 + 1));        
           this.setState(
             (prevState, props) => ({
               loading: false
@@ -128,7 +140,25 @@ class App extends React.Component {
   onTotalChannelChange(value) {
     this.totalChannels = value;
   }
+
+  //event for when back button is pressed
+  componentDidMount() {
+    window.addEventListener("popstate", (e) => {
+      //set state
+      this.setState(
+        (prevState, props) => ({
+          loading: true
+        })
+      );
+
+      //trigger new fresh search
+      this.FreshSearch();
+    });
+  }
+
   
+
+
   render() {
     console.log("app render"); 
     console.log(this.offset);
@@ -140,7 +170,14 @@ class App extends React.Component {
           <h1 className="has-text-centered headline">
             FM Radio of the World
           </h1>          
-          <Search channels={this.channels} onChangeText={this.onTriggerSearch} loading={this.state.loading} onClickToggleState={this.onToggle}/>
+          <Search 
+            channels={this.channels} 
+            onChangeText={this.onTriggerSearch} 
+            loading={this.state.loading} 
+            onClickToggleState={this.onToggle} 
+            filterString={this.filterString}
+            searchString={this.searchString}
+            />
           {
             this.state.error ? 
             <div className="error-msg"> 

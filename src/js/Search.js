@@ -1,4 +1,5 @@
 import React from 'react';
+import Input from './Input';
 import { FaSearch } from 'react-icons/fa';
 //import loading icon 
 import { FaSpinner } from 'react-icons/fa';
@@ -6,12 +7,20 @@ import { FaSpinner } from 'react-icons/fa';
 
 class Search extends React.Component {
   constructor(props) {
-    super(props);    
+    super(props);        
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onClickToggle = this.onClickToggle.bind(this);
     this.darkenBg = this.darkenBg.bind(this);
     this.normalBg = this.normalBg.bind(this);
     this.disableLabel = this.disableLabel.bind(this);
+    if(this.props.filterString !== "byname") {
+      this.leftBtn = "active";
+      this.rightBtn = "";
+    }
+    else {
+      this.leftBtn = "";
+      this.rightBtn = "active";
+    }
   }
   
   handleSubmit(event) {    
@@ -73,20 +82,33 @@ class Search extends React.Component {
     , 300); //300ms must be same as .3s transitions for the buttons   
   }
 
-  render (){
+  //on component update
+  componentDidUpdate() {    
+    if(this.props.filterString !== "byname") {
+      this.leftBtn = "active";
+      this.rightBtn = "";
+    }
+    else {
+      this.leftBtn = "";
+      this.rightBtn = "active";
+    }
+  }
+
+  //.left class is necessary on left btn 
+  render (){    
     return (      
       <form id="searchForm" onSubmit={this.handleSubmit}>
         <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>
-          <span className="cover left"></span>
-          <button type="button" className="button is-rounded is-ghost active left" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
+          <span className={"cover " + (!!this.leftBtn ? "left" : "")}></span>
+          <button type="button" className={"button is-rounded is-ghost left" + this.leftBtn } onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
             Country
           </button>
-          <button type="button" className="button is-rounded is-ghost" onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
+          <button type="button" className={"button is-rounded is-ghost " + this.rightBtn } onClick={this.onClickToggle} onMouseEnter={this.darkenBg} onMouseLeave={this.normalBg}>
             Channel
           </button>            
         </label>
         <div className="control has-icons-right">
-          <input name="search" id="search" className="input is-large" type="text" placeholder="e.g. Australia" />            
+          <Input searchString={this.props.searchString} key={this.props.searchString}/>        
           <span tabIndex="0" className="icon is-medium is-right" onClick={() => document.getElementById("searchForm").requestSubmit()} >              
             {this.props.loading ? <FaSpinner className="fa-spin" /> : <FaSearch />}              
           </span>

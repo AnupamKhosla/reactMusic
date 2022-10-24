@@ -51,7 +51,7 @@ class Pagination extends React.Component{
       //this pagination always has 7 links plus prev and next button
       const totalPages = Math.ceil(this.state.totalChannels / 12); //this 12 is same as app.js limit
       let currentPage = (this.props.offSet / 12) + 1; // 0 offset refers to page1
-      console.log(currentPage, totalPages);
+      console.log("OFFSET:", this.props.offSet, currentPage);
       //total  pagination links  excludin prev and next
       let prevPage = <span className="pagination-previous disabled">Previous</span>;
       let paginationLinks = [];
