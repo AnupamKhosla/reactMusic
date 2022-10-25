@@ -33,14 +33,19 @@ class App extends React.Component {
 
   FreshSearch() { //execute brand new search based upon url params    
     let urlParams = new URLSearchParams(window.location.search);
-    this.searchString = urlParams.get("search") || "australia"; //default value of search input
+    this.searchString = urlParams.get("search"); //default value of search input
+    let tmpSearchString = this.searchString || "australia";
     this.filterString = urlParams.get("filter") || "bycountry"; //default value of toggle buttons    
-    this.offset = ((urlParams.get("page")-1)*12) || 0 // for pagination, change by 12 every page, same as limit. page1 == offset0, page2==offset12
+    if((this.filterString !== "bycountry") && (tmpSearchString == "")) {
+      tmpSearchString = "90.7 fm"
+    }    
+    this.offset = ((urlParams.get("page")-1) > -1) ? ((urlParams.get("page")-1)*12) : 0 // for pagination, change by 12 every page, same as limit. page1 == offset0, page2==offset12
     this.channels = [];
     this.totalChannels = 0;
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
-    this.radio_query = "https://de1.api.radio-browser.info/json/stations/";
-    this.full_query = this.radio_query + this.filterString + "/" + this.searchString;
+    this.radio_query = "https://at1.api.radio-browser.info/json/stations/"; 
+    //IMPORTANT: In future check for multiple servers response and use the one that's active, one was down last time
+    this.full_query = this.radio_query + this.filterString + "/" + tmpSearchString;
     //fetch with cors
     console.log(this.full_query + "?limit=12" + "&offset=" + this.offset);
     fetch(this.full_query + "?limit=12" + "&offset=" + this.offset)
@@ -83,7 +88,12 @@ class App extends React.Component {
     let fallbackString = (this.filterString == "bycountry" ? "australia" : "90.7");
     let valueLowerCase = value.toLowerCase() || fallbackString; //if empty use fallback
     if(!this.state.loading && (this.searchString != valueLowerCase) ) {  // no change in state untill prev fetch is complete or search string is same
-      this.searchString = valueLowerCase; 
+      if(!!value) { //if search field text is not empty
+        this.searchString = valueLowerCase; 
+      }
+      else {
+        this.searchString = "";
+      }
       this.channels = [];
       this.setState( 
         (prevState, props) => ({
@@ -104,9 +114,13 @@ class App extends React.Component {
           throw new Error('Something went wrong');  
         })
         .then(data => {          
-          this.channels = data || [];  
-          //set url
-          window.history.pushState({}, "", "/?search=" + valueLowerCase + "&filter=" + this.filterString + "&page=" + (this.offset/12 + 1));        
+          this.channels = data || []; 
+          //get pathname via url api
+          //let pathname = new URL(window.location).pathname;
+
+
+          window.history.pushState({}, "", window.location.pathname + "?search=" + this.searchString + "&filter=" + this.filterString + "&page=" + (this.offset/12 + 1));        
+          
           this.setState(
             (prevState, props) => ({
               loading: false
@@ -150,7 +164,7 @@ class App extends React.Component {
           loading: true
         })
       );
-
+      console.log("popstate");
       //trigger new fresh search
       this.FreshSearch();
     });

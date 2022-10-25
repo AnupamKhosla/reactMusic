@@ -5,7 +5,7 @@ class Input extends React.Component {
 	constructor(props) {
     	super(props);   
   	  this.state = {
-	    	inputValue: this.props.searchString
+	    	inputValue: this.props.searchString || ""
 	  	};
 		  this.handleChange = this.handleChange.bind(this);
 	}
@@ -15,15 +15,14 @@ class Input extends React.Component {
 	}
 	
 
-	render() {
-		
+	render() {		
 		return (
 			 <input 
 	        name="search" 
 	        id="search" 
 	        className="input is-large" 
 	        type="text" 
-	        placeholder="e.g. Australia" 
+	        placeholder={this.props.placeHolder} 
 	        value={this.state.inputValue}
 	        onChange={this.handleChange}
 	      />    
