@@ -61,8 +61,8 @@ class App extends React.Component {
     this.searchString = this.urlParams.get("search"); //default value of search input
     this.tmpSearchString = this.searchString || "australia";
     this.filterString = this.urlParams.get("filter") || "bycountry"; //default value of toggle buttons    
-    if((this.filterString !== "bycountry") && (this.tmpSearchString == "")) {
-      this.tmpSearchString = "90.7 fm"
+    if((this.filterString !== "bycountry") && (this.searchString == "")) {
+      this.tmpSearchString = "90.7"
     }    
     this.offset = ((this.urlParams.get("page")-1) > -1) ? ((this.urlParams.get("page")-1)*12) : 0 // for pagination, change by 12 every page, same as limit. page1 == offset0, page2==offset12
     this.channels = [];
@@ -70,7 +70,7 @@ class App extends React.Component {
   }
 
   FreshSearch() { //execute brand new search based upon url params    
-    
+    console.log(this.filterString);
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
     this.radio_query = this.selectedServer + "/json/stations/"; 
     //IMPORTANT: In future check for multiple servers response and use the one that's active, one was down last time
@@ -211,7 +211,7 @@ class App extends React.Component {
   onPageChange(e) {
     //if e.target is an anchor tag and e.target.classList.value has string pagination
     if(e.target.tagName == "A" && e.target.classList.value.includes("pagination") && !e.target.classList.value.includes("is-current")) {
-      let value = this.searchString; //Use old searchstring, because user hasn't fetched new search results yet.
+      let value = this.searchString || ""; //Use old searchstring, because user hasn't fetched new search results yet.
       this.searchString = value + "makeDifferentFromValue"; //makes react think that new search string so that fetch condition is met         
       this.onTriggerSearch(value, e); // value !== searchString
     }
@@ -222,14 +222,15 @@ class App extends React.Component {
 
   //event for when back button is pressed
   componentDidMount() {
-    window.addEventListener("popstate", (e) => {      
+    window.addEventListener("popstate", (e) => {   
+      console.log("popstate");   
       this.resetQuery(); //grab new query params from url
       this.setState(
         (prevState, props) => ({
           loading: true
         })
       );
-      console.log("popstate");
+      
       //trigger new fresh search
       this.FreshSearch();
     });
