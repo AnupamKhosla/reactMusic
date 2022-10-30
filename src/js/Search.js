@@ -105,13 +105,11 @@ class Search extends React.Component {
       this.leftBtn = "";
       this.rightBtn = "active";
       this.placeHolder = "e.g. 90.7 fm";      
-    }
-    console.log("form mount ", this.placeHolder);
+    }    
   }
 
   //.left class is necessary on left btn 
-  render (){    
-    console.log("form re render ", this.placeHolder);
+  render (){        
     return (      
       <form id="searchForm" onSubmit={this.handleSubmit}>
         <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>

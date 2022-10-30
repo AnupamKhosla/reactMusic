@@ -69,8 +69,7 @@ class App extends React.Component {
     this.totalChannels = 0;
   }
 
-  FreshSearch() { //execute brand new search based upon url params    
-    console.log(this.filterString);
+  FreshSearch() { //execute brand new search based upon url params        
     // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
     this.radio_query = this.selectedServer + "/json/stations/"; 
     //IMPORTANT: In future check for multiple servers response and use the one that's active, one was down last time
@@ -98,42 +97,40 @@ class App extends React.Component {
       });       
   }
   selectServer(index) {
-
-     var res = fetch("https://" + this.servers[index].name + "/json/stats")
-                .then(response => {                    
-                    if (response.ok) {
-                        this.selectedServer = this.servers[index].name;            
-                        this.FreshSearch();
-                        return 1;
-                    }                          
-                    else if((index+1) < this.servers.length) {
-                        console.info("trying next server");
-                        this.selectServer(index+1);
-                    }
-                    else {
-                      this.setState({
-                        error: true,
-                        loading: false
-                      });
-                      throw new Error('All servers are down');
-                    } 
-                }, 
-                error => {
-                  if((index+1) < this.servers.length) {
-                    console.info("trying next server");
-                    this.selectServer(index+1);
+   fetch("https://" + this.servers[index].name + "/json/stats")
+              .then(response => {                    
+                  if (response.ok) {
+                      this.selectedServer = this.servers[index].name;            
+                      this.FreshSearch();
+                      return 1;
+                  }                          
+                  else if((index+1) < this.servers.length) {
+                      console.info("trying next server");
+                      this.selectServer(index+1);
                   }
                   else {
-                    //set state error
                     this.setState({
                       error: true,
                       loading: false
                     });
                     throw new Error('All servers are down');
                   } 
+              }, 
+              error => {
+                if((index+1) < this.servers.length) {
+                  console.info("trying next server");
+                  this.selectServer(index+1);
                 }
-              );    
-    
+                else {
+                  //set state error
+                  this.setState({
+                    error: true,
+                    loading: false
+                  });
+                  throw new Error('All servers are down');
+                } 
+              }
+            );        
   }
 
 
@@ -143,7 +140,7 @@ class App extends React.Component {
     //for new searches, create new pagination and start from page 1
     //this line executes on toggle and form search click/enter
       this.offset = 0;
-      this.totalChannels = 0; //this will update the state of pagination and cause re render with new empty ata
+      this.totalChannels = 0; //this will update the state of pagination and cause re render with new empty data
     }
     else { //this happens on pagination click        
       //set this.offset to data value of event.currentTarget
@@ -151,10 +148,29 @@ class App extends React.Component {
       //offset 12 means result starts from 13th     
     }
     let fallbackString = (this.filterString == "bycountry" ? "australia" : "90.7");
-    let valueLowerCase = value.toLowerCase() || fallbackString; //if empty use fallback
-    if(!this.state.loading && (this.searchString != valueLowerCase) ) {  // no change in state untill prev fetch is complete or search string is same
+    //value is current search input value
+    let currentValueFallback = value.toLowerCase() || fallbackString; //if empty use fallback
+    let prevValueFallback = ""; //on non toggle events represents previous search input value/fallback
+    //on toggle, this.searchString is always unique and nonempty and != actualPrevSearchValue
+    //so the following if-else won'yt make any difference in decididing state change
+    if(!!this.searchString) { 
+      prevValueFallback = this.searchString.toLowerCase();
+      //on toggle prevValueFallback is always != currentValueFallback
+    }
+    else { 
+      //empty -- this has to execute only on non toggle events
+      //so this.searchString is previous query string
+      prevValueFallback = (this.filterString == "bycountry" ? "australia" : "90.7");
+    }
+    //this.searchString != currentValueFallback will not suffice for when both prev and curr search strings were empty
+    //currentValueFallback != prevValueFallback will check if both prev and curr search strings are not empty
+   
+
+    if( !this.state.loading && (this.searchString != currentValueFallback) && (currentValueFallback != prevValueFallback) ) {  
+    // no change in state untill prev fetch is complete or search string is same
+    // on toggle always change state
       if(!!value) { //if search field text is not empty
-        this.searchString = valueLowerCase; 
+        this.searchString = currentValueFallback; 
       }
       else {
         this.searchString = "";
@@ -165,7 +181,7 @@ class App extends React.Component {
           loading: true
         })
       ); //this will trigger re render, it will remove the existing cards.
-      this.full_query =  "https://" + this.radio_query + this.filterString + "/" + valueLowerCase;
+      this.full_query =  "https://" + this.radio_query + this.filterString + "/" + currentValueFallback;
       fetch(this.full_query + "?limit=12" + "&offset=" + this.offset)
         .then(response => {
           if (response.ok) {
