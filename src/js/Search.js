@@ -13,16 +13,7 @@ class Search extends React.Component {
     this.darkenBg = this.darkenBg.bind(this);
     this.normalBg = this.normalBg.bind(this);
     this.disableLabel = this.disableLabel.bind(this);
-    if(this.props.filterString !== "byname") {
-      this.leftBtn = "active";
-      this.rightBtn = "";
-      this.placeHolder = "e.g. Australia";      
-    }
-    else {
-      this.leftBtn = "";
-      this.rightBtn = "active";
-      this.placeHolder = "e.g. 90.7 fm";
-    }
+    this.leftBtn = "active";
 
   }
   
@@ -93,23 +84,21 @@ class Search extends React.Component {
       , 300); //300ms must be same as .3s transitions for the buttons   
     }     
   }
+  
 
-  //on component update
-  componentDidUpdate() {    
+  //.left class is necessary on left btn 
+  render (){       
     if(this.props.filterString !== "byname") {
       this.leftBtn = "active";
       this.rightBtn = "";
-      this.placeHolder = "e.g. Australia";
+      this.placeHolder = "e.g. Australia";      
     }
     else {
       this.leftBtn = "";
       this.rightBtn = "active";
-      this.placeHolder = "e.g. 90.7 fm";      
-    }    
-  }
-
-  //.left class is necessary on left btn 
-  render (){        
+      this.placeHolder = "e.g. 90.7 fm";
+    }
+    
     return (      
       <form id="searchForm" onSubmit={this.handleSubmit}>
         <label htmlFor="search" className="label toggle-btns" onClick={this.disableLabel}>
@@ -122,7 +111,7 @@ class Search extends React.Component {
           </button>            
         </label>
         <div className="control has-icons-right">
-          <Input searchString={this.props.searchString} key={this.props.searchString} placeHolder={this.placeHolder}/>        
+          <Input searchString={this.props.searchString} offSet={this.props.offSet} key={this.props.searchString} placeHolder={this.placeHolder}/>        
           <span tabIndex="0" className="icon is-medium is-right" onClick={() => document.getElementById("searchForm").requestSubmit()} >              
             {this.props.loading ? <FaSpinner className="fa-spin" /> : <FaSearch />}              
           </span>

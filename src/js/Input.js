@@ -14,8 +14,14 @@ class Input extends React.Component {
 		this.setState({inputValue: event.target.value});
 	}
 	
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		//logic to update search input value to correct value when new page is clicked while user had filled the input field
+		if(prevProps.offSet !== this.props.offSet) {
+			this.setState({inputValue: this.props.searchString});
+		}
+	}
 
-	render() {		
+	render() {				
 		return (
 			 <input 
 	        name="search" 

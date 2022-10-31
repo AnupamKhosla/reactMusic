@@ -49,12 +49,14 @@ class App extends React.Component {
                     }
                 ]    
     this.selectServer(0); //if nth server fails it will try n+1th server
-    //also will call FreshSearch() on success
+    //also will call freshSearch() on success
 
     this.onTriggerSearch = this.onTriggerSearch.bind(this);
     this.onToggle = this.onToggle.bind(this);
     this.onPageChange = this.onPageChange.bind(this);
-    this.onTotalChannelChange = this.onTotalChannelChange.bind(this);    
+    this.onTotalChannelChange = this.onTotalChannelChange.bind(this);  
+    this.resetQuery = this.resetQuery.bind(this);
+    this.freshSearch = this.freshSearch.bind(this);
   }
   resetQuery() {
     this.urlParams = new URLSearchParams(window.location.search);
@@ -68,9 +70,8 @@ class App extends React.Component {
     this.channels = [];
     this.totalChannels = 0;
   }
-
-  FreshSearch() { //execute brand new search based upon url params        
-    // api_key = "AIzaSyAuW0tVBPyQQFkpXaB_2G7pcwViIB22DRg"; // old Youtube API
+  freshSearch() { //execute brand new search based upon url params        
+    console.log(this);
     this.radio_query = this.selectedServer + "/json/stations/"; 
     //IMPORTANT: In future check for multiple servers response and use the one that's active, one was down last time
     this.full_query = "https://" + this.radio_query + this.filterString + "/" + this.tmpSearchString;
@@ -101,7 +102,7 @@ class App extends React.Component {
               .then(response => {                    
                   if (response.ok) {
                       this.selectedServer = this.servers[index].name;            
-                      this.FreshSearch();
+                      this.freshSearch();
                       return 1;
                   }                          
                   else if((index+1) < this.servers.length) {
@@ -132,8 +133,6 @@ class App extends React.Component {
               }
             );        
   }
-
-
   onTriggerSearch(value, event = undefined) { //when search icon is clicked or form is submitted with "enter"
     //use this when search results need to update on re render      
     if(!event.target.classList.value.includes("pagination")) { //not from pagination
@@ -170,7 +169,7 @@ class App extends React.Component {
     // no change in state untill prev fetch is complete or search string is same
     // on toggle always change state
       if(!!value) { //if search field text is not empty
-        this.searchString = currentValueFallback; 
+        this.searchString = currentValueFallback;         
       }
       else {
         this.searchString = "";
@@ -234,10 +233,8 @@ class App extends React.Component {
   }
   onTotalChannelChange(value) {
     this.totalChannels = value;
-  }
-
-  //event for when back button is pressed
-  componentDidMount() {
+  }  
+  componentDidMount() { //event for when back button is pressed
     window.addEventListener("popstate", (e) => {   
       console.log("popstate");   
       this.resetQuery(); //grab new query params from url
@@ -248,19 +245,14 @@ class App extends React.Component {
       );
       
       //trigger new fresh search
-      this.FreshSearch();
+      this.freshSearch();
     });
   }
-
-  
-
-
   render() {
     console.log("app render");     
     return (
       <>
-        <Header /> 
-        
+        <Header freshSearch={this.freshSearch} resetQuery={this.resetQuery} />         
         <div className="main container section"> 
           <h1 className="has-text-centered headline">
             FM Radio of the World
@@ -271,7 +263,8 @@ class App extends React.Component {
             loading={this.state.loading} 
             onClickToggleState={this.onToggle} 
             filterString={this.filterString}
-            searchString={this.searchString}
+            searchString={this.searchString}            
+            offSet={this.offset} 
             />
           {
             this.state.error ? 

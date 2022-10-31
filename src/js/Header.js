@@ -9,13 +9,20 @@ class Header extends React.Component {
   constructor(props) {
     super(props);
     this.toggleMenu = this.toggleMenu.bind(this);
+    this.logoClick = this.logoClick.bind(this);
   }
   toggleMenu(e){
     //toggle class .is-active on current target and target's parent's mext sibling
     e.currentTarget.classList.toggle('is-active');
     e.currentTarget.closest('.navbar').querySelector('.navbar-menu').classList.toggle('is-active');
-
-
+  }
+  logoClick(e) {
+    e.preventDefault();  
+    //change url  
+    window.history.pushState({}, '', '/');
+    this.props.resetQuery();
+    this.props.freshSearch();
+    //prevent default action of link   
   }
 
 
@@ -24,7 +31,7 @@ class Header extends React.Component {
     return (      
       <nav className='navbar section' role='navigation' aria-label='main navigation'>
         <div className='navbar-brand'>
-          <a href='/' className='navbar-item'>
+          <a href='/' className='navbar-item' onClick={this.logoClick}>
             <img
               src={require("../images/musical-note.png")}
               alt='Logo'              
