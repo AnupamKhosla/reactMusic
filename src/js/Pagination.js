@@ -133,7 +133,7 @@ class Pagination extends React.Component{
         <>
           <SwitchTransition mode='out-in' >  
             <CSSTransition key={new Date().getTime() + Math.random()} timeout={300} classNames="item" >
-              <nav className="pagination is-centered column is-full" role="navigation" aria-label="pagination" onClick={this.onPageLinkClick}>
+              <nav className="pagination is-centered column is-full loading" role="navigation" aria-label="pagination" onClick={this.onPageLinkClick}>
                 <ul className="pagination-list">            
                   <li><span className="pagination-ellipsis pagination-link animate-loading"> </span></li>            
                 </ul>

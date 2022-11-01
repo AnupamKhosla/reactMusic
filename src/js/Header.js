@@ -19,7 +19,7 @@ class Header extends React.Component {
   logoClick(e) {
     e.preventDefault();  
     //change url  
-    window.history.pushState({}, '', '/');
+    window.history.pushState({}, '', window.location.pathname);
     this.props.resetQuery();
     this.props.freshSearch();
     //prevent default action of link   

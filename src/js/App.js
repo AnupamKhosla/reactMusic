@@ -288,6 +288,11 @@ class App extends React.Component {
           }
           {/* In future find a way to NOT UPDATE/RE_RENDER Cards when this.stateloading changes */}          
         </div> 
+        <footer>
+          <p className="container">
+            Designed and developed solely by <a href="https://www.linkedin.com/in/anupamkhosla/">Anupam Khosla</a> using <a href="https://reactjs.org/">ReactJs</a>. The deisgn and code is licenced under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+          </p>
+        </footer>
       </>
     )
   };

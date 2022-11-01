@@ -13,6 +13,7 @@
   --pm-color-x-dark: #b23d20;
   --pm-text:  #e5e5e5;
   --pm-text-light: #cfc8c6;
+  --pm-text-x-light: #998c88;
   --pm-text-bright: #fff;  
   background-color: var(--pm-bg-x-dark);
   color:  var(--pm-text-bright);
@@ -21,7 +22,7 @@
   word-wrap: break-word;
 }
 a {
-  color: #998c88;
+  color: var(--pm-text-x-light);
 }
 
 a:hover, a:focus {
@@ -275,10 +276,11 @@ a.navbar-item:focus {
 
 
 /*Pagination*/
-.pagination {
+#root .pagination {
   align-items: center;
   display: flex;
   justify-content: center;
+  margin-bottom: 0;
 }
 .pagination .pagination-list {
   margin: 0;
@@ -394,6 +396,23 @@ a.navbar-item:focus {
 
 
 
+/*footer css*/
+footer {
+  background-color:  var(--pm-bg);
+  margin-top: 2rem;
+}
+footer p {
+  padding: 1rem;
+  text-align: center;
+  color: var(--pm-text-x-light);
+}
+footer a {
+  color: var(--pm-text-light);
+}
+footer a:hover, footer a:focus {
+  color: var(--pm-text-bright);
+}
+
 
 
 @media screen and (max-width: 1023px) {
@@ -417,5 +436,29 @@ a.navbar-item:focus {
 @media screen and (max-width:  767.8px) {
   .main.section {
     padding:  3rem 1rem;
+  }
+  .pagination, .animate-loading {
+    width: 390px;
+    max-width: 390px;
+    margin: auto;
+    min-height: 80px;
+  }
+  .pagination-previous, .pagination-next {
+    flex: 0 0 123px;
+  }
+  .pagination-previous, .pagination-next, .pagination-link {
+    min-width: 32px;
+    height: 32px;
+  }
+}
+@media screen and (max-width: 575.8px) {
+  .pagination-previous, .pagination-next, .pagination-link, .pagination-ellipsis {
+    margin: 0.25rem 2px;
+  }
+  .loading .pagination-list {
+    width: 100%;
+  }
+  .pagination, .animate-loading {
+    width: 100%;    
   }
 }
