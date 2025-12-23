@@ -30,7 +30,7 @@ class Cards extends React.Component {
     var fallback = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
     console.log("BEFORE IF MAYBE " + e.target.src);
     if(e.target.src != fallback) {
-      //e.target.src = fallback;
+      e.target.src = fallback;
       console.log("image load error for " + e.target.src);
     }    
   }
