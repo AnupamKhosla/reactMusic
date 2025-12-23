@@ -26,7 +26,10 @@ class Cards extends React.Component {
     //stop form submission
     event.preventDefault();
   }
-  onImgError(e) {      
+  onImgError(e) {     
+    //sometime api returns "null" string for channel.favicon image src
+    //that is why I put condition startsWIth http in img src attribute
+    //I intentionally do not use startsWith https, to see console errors for http images, to see if they fail to load. 
     var fallback = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
     console.log("BEFORE IF MAYBE " + e.target.src);
     if(e.target.src != fallback) {
