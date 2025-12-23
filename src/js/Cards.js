@@ -26,11 +26,12 @@ class Cards extends React.Component {
     //stop form submission
     event.preventDefault();
   }
-  onImgError(e) {  
-    console.log(e.target);
+  onImgError(e) {      
     var fallback = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
+    console.log("BEFORE IF MAYBE " + e.target.src);
     if(e.target.src != fallback) {
-      e.target.src = fallback;
+      //e.target.src = fallback;
+      console.log("image load error for " + e.target.src);
     }    
   }
 
@@ -84,8 +85,8 @@ class Cards extends React.Component {
                                       <div className="media">
                                         <div className="media-left">
                                           <figure className="image is-48x48">
-                                            <img  src={channel.favicon ? channel.favicon : "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="} 
-                                            alt="channel logo"
+                                            <img  src={channel.favicon.startsWith('http') ? channel.favicon : "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="} 
+                                            alt="channel logo" data-test-src={channel.favicon.startsWith('http')}
                                             onError={this.onImgError}
 
                                             />

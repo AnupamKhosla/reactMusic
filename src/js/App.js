@@ -23,30 +23,23 @@ class App extends React.Component {
     this.resetQuery();
     this.selectedServer = undefined;
     this.servers = [
+                    
                     {
-                        "ip": "95.179.139.106",
-                        "name": "nl1.api.radio-browser.info"
+                        "ip": "",
+                        "name": "fi1.api.radio-browser.info"
+                    },                    
+                    {
+                        "ip": "",
+                        "name": "de2.api.radio-browser.info"
                     },
                     {
-                        "ip": "89.58.16.19",
-                        "name": "at1.api.radio-browser.info"
+                        "ip": "",
+                        "name": "cors-anywhere.herokuapp.com/https://fi1.api.radio-browser.info/json/stats"
                     },
                     {
-                        "ip": "188.68.62.16",
-                        "name": "de1.api.radio-browser.info"
+                        "ip": "",
+                        "name": "cors-anywhere.herokuapp.com/https://de21.api.radio-browser.info/json/stats"
                     },
-                    {
-                        "ip": "2a03:4000:6:8077::1",
-                        "name": "de1.api.radio-browser.info"
-                    },
-                    {
-                        "ip": "2a0a:4cc0:0:db9:282b:91ff:fed0:ddea",
-                        "name": "at1.api.radio-browser.info"
-                    },
-                    {
-                        "ip": "2001:19f0:5001:32a4:5400:2ff:fe37:75c2",
-                        "name": "nl1.api.radio-browser.info"
-                    }
                 ]    
     this.selectServer(0); //if nth server fails it will try n+1th server
     //also will call freshSearch() on success
@@ -71,7 +64,7 @@ class App extends React.Component {
     this.totalChannels = 0;
   }
   freshSearch() { //execute brand new search based upon url params        
-    console.log(this);
+    
     this.radio_query = this.selectedServer + "/json/stations/"; 
     //IMPORTANT: In future check for multiple servers response and use the one that's active, one was down last time
     this.full_query = "https://" + this.radio_query + this.filterString + "/" + this.tmpSearchString;
@@ -98,40 +91,44 @@ class App extends React.Component {
       });       
   }
   selectServer(index) {
-   fetch("https://" + this.servers[index].name + "/json/stats")
-              .then(response => {                    
-                  if (response.ok) {
-                      this.selectedServer = this.servers[index].name;            
-                      this.freshSearch();
-                      return 1;
-                  }                          
-                  else if((index+1) < this.servers.length) {
-                      console.info("trying next server");
-                      this.selectServer(index+1);
-                  }
-                  else {
-                    this.setState({
-                      error: true,
-                      loading: false
-                    });
-                    throw new Error('All servers are down');
-                  } 
-              }, 
-              error => {
-                if((index+1) < this.servers.length) {
-                  console.info("trying next server");
-                  this.selectServer(index+1);
-                }
-                else {
-                  //set state error
-                  this.setState({
-                    error: true,
-                    loading: false
-                  });
-                  throw new Error('All servers are down');
-                } 
-              }
-            );        
+   fetch("https://" + this.servers[index].name + "/json/stats", {
+      headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+      }    
+    })
+    .then(response => {                    
+        if (response.ok) {
+            this.selectedServer = this.servers[index].name;            
+            this.freshSearch();
+            return 1;
+        }                          
+        else if((index+1) < this.servers.length) {
+            console.info("trying next server");
+            this.selectServer(index+1);
+        }
+        else {
+          this.setState({
+            error: true,
+            loading: false
+          });
+          throw new Error('All servers are down');
+        } 
+    }, 
+    error => {
+      if((index+1) < this.servers.length) {
+        console.info("trying next server");
+        this.selectServer(index+1);
+      }
+      else {
+        //set state error
+        this.setState({
+          error: true,
+          loading: false
+        });
+        throw new Error('All servers are down');
+      } 
+    }
+  );        
   }
   onTriggerSearch(value, event = undefined) { //when search icon is clicked or form is submitted with "enter"
     //use this when search results need to update on re render      
