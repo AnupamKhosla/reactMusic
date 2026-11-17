@@ -51,6 +51,7 @@ node scripts/nav-check.mjs http://localhost:5173   # no reloads between pages, p
 node scripts/dial-check.mjs http://localhost:5173  # dial drag/click/keys, card links, back button, skeletons
 node scripts/shots.mjs http://localhost:5173       # headless screenshots into .smoke/
 node scripts/contrast.mjs                          # WCAG 2.2 contrast of every colour pair, both schemes
+node scripts/cpu-check.mjs https://liveradio.space # live CPU ms per page (reads `wrangler tail`)
 npm run preview                                    # the production build in the Workers runtime
 ```
 
@@ -88,22 +89,32 @@ in your own browsers on `/dashboard` so your visits don't count.
 
 ## Going live (all on free plans)
 
-Nothing below has been done yet. Each step is the owner's.
+State on 2026-11-17:
 
-1. `npx wrangler login`
-2. `npx wrangler d1 create liveradio`, then paste the printed `database_id` into `wrangler.jsonc`
-   under `d1_databases`.
-3. `npm run db:remote` (creates the stats tables in the live database).
-4. `npx wrangler secret put STATS_PASSWORD` (8+ characters; typed into the prompt, never stored in the repo).
-5. `npm run deploy`. Try it on the `liveradio.<account>.workers.dev` address it prints.
-6. The domain: liveradio.space is registered at GoDaddy (**expires 23 Dec 2026**) and today points at the
-   old GitHub Pages site. Add it to Cloudflare (free plan), switch the nameservers at GoDaddy to the two
-   Cloudflare gives you, then uncomment `routes` in `wrangler.jsonc` and run `npm run deploy` again.
-   Afterwards turn off GitHub Pages for the old repo.
-7. Google Search Console: add the domain, submit `https://liveradio.space/sitemap.xml`.
+1. Done: `wrangler login`; D1 database `liveradio` created (its id is in `wrangler.jsonc`); `npm run db:remote`
+   applied the stats tables; `npm run deploy` deployed the Worker.
+2. Done: liveradio.space added to Cloudflare as a Free-plan zone. Its DNS records were imported (the old GitHub
+   Pages A records, `www`, the `_dmarc` and google-site-verification TXT records); Always Use HTTPS is on; the
+   Worker serves `liveradio.space/*` and `www.liveradio.space/*` (`routes` in `wrangler.jsonc`; www redirects
+   to the bare domain).
+3. **Owner:** at GoDaddy (the registrar; the domain **expires 23 Dec 2026**), set the nameservers to
+   `damon.ns.cloudflare.com` and `paige.ns.cloudflare.com`. Until the switch reaches everyone (minutes to a
+   day), some visitors still get the old GitHub Pages site; both work, and v1 addresses 301 to v2 pages.
+4. **Owner:** the dashboard password, 8+ characters, typed into the prompt and never stored in the repo:
+   `npx wrangler secret put STATS_PASSWORD`. Until it is set, `/dashboard` stays locked.
+5. Once the zone shows "Active" in Cloudflare: check the site, then turn off GitHub Pages for the old repo, and
+   submit `https://liveradio.space/sitemap.xml` in Google Search Console (the domain is already verified there
+   by its TXT record).
 
-Free-plan limits: Workers 100,000 requests a day and 10 ms of CPU per request (the edge cache keeps most page
-views from rendering at all); D1 5 million reads and 100,000 writes a day, 5 GB.
+`workers_dev` is off, so the `*.workers.dev` copy of the site no longer answers (no duplicate pages for search
+engines).
+
+Free-plan limits: Workers 100,000 requests a day and 10 ms of CPU per request; D1 5 million reads and 100,000
+writes a day, 5 GB. Measured on 17 Nov (`node scripts/cpu-check.mjs <url>`): a page served from the edge cache
+costs 0–1 ms; a page rendered fresh costs 20–40 ms, and the first request of a new Worker instance 60–80 ms.
+Cloudflare let every one of them through (outcome "ok"); it tolerates occasional overruns but may stop a Worker
+that is over the limit all the time with error 1102. The edge cache keeps most visits at 0–1 ms. If 1102 errors
+ever show up in the Worker's logs, the cure is rendering less per page (or the paid plan, the owner's call).
 
 ## Known limits
 

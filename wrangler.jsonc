@@ -25,7 +25,12 @@
 	"observability": {
 		"enabled": true
 	},
-	"upload_source_maps": true
-	// Custom domain, once liveradio.space uses Cloudflare's nameservers (README.md, "Going live"):
-	// "routes": [{ "pattern": "liveradio.space", "custom_domain": true }, { "pattern": "www.liveradio.space", "custom_domain": true }]
+	"upload_source_maps": true,
+	// The site's own domain (a Cloudflare zone on the Free plan, nameservers damon/paige.ns.cloudflare.com).
+	// Routes, not custom domains: they sit on the zone's existing proxied DNS records. www redirects to the
+	// bare domain in workers/app.ts.
+	"routes": [
+		{ "pattern": "liveradio.space/*", "zone_name": "liveradio.space" },
+		{ "pattern": "www.liveradio.space/*", "zone_name": "liveradio.space" }
+	]
 }
