@@ -2,13 +2,26 @@ import type { Route } from "./+types/sitemap";
 import { paths } from "~/lib/names";
 import { guard, notFound } from "~/lib/pages.server";
 import { getCountries, getGenres, getLanguages, SITEMAP_STATION_FILES, sitemapStations } from "~/lib/radio.server";
-import { urlset } from "~/lib/sitemap.server";
+import { KNOWN_GENRES, MAIN_COUNTRIES, MAIN_GENRES, MAIN_HUBS, MAIN_LANGUAGES, urlset } from "~/lib/sitemap.server";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const name = params.file.replace(/\.xml$/, "");
   if (name === params.file) notFound();
 
   switch (name) {
+    case "main": {
+      // Stage 1: the hubs, then the biggest countries, genres and languages (each list is sorted by station count).
+      const [countries, genres, languages] = await Promise.all([guard(getCountries), guard(getGenres), guard(getLanguages)]);
+      return urlset([
+        ...MAIN_HUBS.map((path) => ({ path })),
+        ...countries.slice(0, MAIN_COUNTRIES).map((c) => ({ path: paths.country(c.slug) })),
+        ...genres
+          .filter((g) => KNOWN_GENRES.has(g.name))
+          .slice(0, MAIN_GENRES)
+          .map((g) => ({ path: paths.genre(g.slug) })),
+        ...languages.slice(0, MAIN_LANGUAGES).map((l) => ({ path: paths.language(l.slug) })),
+      ]);
+    }
     case "pages":
       return urlset(["/", "/top", "/countries", "/genres", "/languages", "/about", "/privacy"].map((path) => ({ path })));
     case "countries": {

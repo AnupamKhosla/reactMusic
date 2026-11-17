@@ -4,6 +4,11 @@ Newest first. Status: open / done / waiting (on the owner).
 
 ## 2026-11-17 (after the first v2 look)
 
+- done (submitting waits for Google's DNS to see Cloudflare): give Google a lightweight sitemap of the main pages
+  first, so a new site with thousands of look-alike station pages isn't taken for spam; get the main pages indexed
+  first, then grow the sitemap in steps. `/sitemap.xml` now lists only `main.xml` (56 addresses); stages in the
+  README, "Sitemap stages".
+
 - done: dashboard moved from `/stats` to `/dashboard`.
 - waiting: the dashboard password. Owner asked for one command for it: `npm run set-password` (a hidden Mac
   dialog, asks twice; README, "Going live"). Until it is run, `/dashboard` stays locked.

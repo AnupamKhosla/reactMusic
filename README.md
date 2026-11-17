@@ -108,6 +108,23 @@ State on 2026-11-17:
    submit `https://liveradio.space/sitemap.xml` in Google Search Console (the domain is already verified there
    by its TXT record).
 
+### Sitemap stages (owner, 2026-11-17)
+
+Google gets the site in steps, so a new domain with thousands of look-alike station pages isn't taken for spam:
+the main pages first, more only once most of them are indexed. `SITEMAP_STAGE` in `app/lib/sitemap.server.ts`
+decides what `/sitemap.xml` lists:
+
+| Stage | `/sitemap.xml` lists | About |
+| --- | --- | --- |
+| 1 (now) | `main.xml`: the 6 hubs, the 20 biggest countries, 20 well-known genres, 10 biggest languages | 56 addresses |
+| 2 | every hub, country and language page | ~410 (224 countries, 182 languages on 17 Nov) |
+| 3 | + every genre page with 20+ stations | +~580 |
+| 4, 5, … | + one station file (500 stations) per stage, 10 files in all | +500 each |
+
+Move up one stage (edit the number, deploy) only when Search Console's Pages report shows most of the current
+stage indexed, and not more than about once a week. Pages outside the sitemap still work and are linked from the
+site; they are just not pushed to Google.
+
 `workers_dev` is off, so the `*.workers.dev` copy of the site no longer answers (no duplicate pages for search
 engines).
 

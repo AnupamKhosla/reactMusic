@@ -9,20 +9,22 @@ const NEVER_CACHE = /^\/(api\/collect|dashboard)/;
 // Ad and campaign tags don't change the page: one cached copy serves them all.
 const IGNORED_PARAMS = /^(utm_[a-z]+|fbclid|gclid|msclkid|ref)$/;
 
-// Each build names its script files differently; the build's version is part of every cache key, so a new
-// deploy never serves a cached page that points at the previous build's (now missing) scripts.
+// Every cache key carries the deployed version, so a new deploy never serves a page cached by the previous one:
+// not its old scripts (the browser build's version) and not its old server output (Cloudflare's id for each
+// deploy; the browser build's version alone stays the same when only server code changes).
 let buildVersion: string | null = null;
-async function version(): Promise<string> {
+async function version(env: Env): Promise<string> {
   if (buildVersion) return buildVersion;
   const build = await import("virtual:react-router/server-build");
-  buildVersion = String((build as { assets?: { version?: string } }).assets?.version ?? "0");
+  const assets = String((build as { assets?: { version?: string } }).assets?.version ?? "0");
+  buildVersion = `${env.CF_VERSION_METADATA?.id ?? "local"}-${assets}`;
   return buildVersion;
 }
 
-async function cacheKey(url: URL, country: string): Promise<Request> {
+async function cacheKey(url: URL, country: string, env: Env): Promise<Request> {
   const key = new URL(url);
   for (const name of [...key.searchParams.keys()]) if (IGNORED_PARAMS.test(name)) key.searchParams.delete(name);
-  key.searchParams.set("__build", await version());
+  key.searchParams.set("__build", await version(env));
   // Without ?country= the home page (and its data for in-app visits) lists the visitor's own country's
   // stations: one cached copy per country.
   if ((url.pathname === "/" || url.pathname === "/_root.data") && !key.searchParams.has("country")) {
@@ -52,7 +54,7 @@ export default {
       !import.meta.env.DEV && request.method === "GET" && !NEVER_CACHE.test(url.pathname) && !request.headers.has("Authorization");
     const cache = (globalThis as unknown as { caches?: { default?: Cache } }).caches?.default;
     if (cacheable && cache) {
-      const key = await cacheKey(url, String(request.cf?.country ?? ""));
+      const key = await cacheKey(url, String(request.cf?.country ?? ""), env);
       const hit = await cache.match(key);
       if (hit) {
         const response = new Response(hit.body, hit);

@@ -41,6 +41,7 @@ check /privacy 200
 check /dashboard 200
 check /robots.txt 200
 check /sitemap.xml 200
+check /sitemaps/main.xml 200
 check /sitemaps/countries.xml 200
 check /sitemaps/stations-1.xml 200
 check /manifest.webmanifest 200
