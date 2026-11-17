@@ -1,8 +1,8 @@
-// Anonymous visit counting for the /stats dashboard. Browser only.
+// Anonymous visit counting for the /dashboard page. Browser only.
 // - A random id in this browser (localStorage) tells new visitors from returning ones. No cookies, no IP address.
 // - A visit counts as a real person only after a real tap, click, key press or scroll.
 // - Browsers that send "Global Privacy Control" get an id that lasts only for the tab.
-// - The owner can switch counting off for their own browser on /stats.
+// - The owner can switch counting off for their own browser on /dashboard.
 
 export type EventType =
   | "pageview"

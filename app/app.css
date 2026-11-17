@@ -101,8 +101,8 @@ body {
 
 .caps {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -111,12 +111,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* The frequency scale along the whole dial: a fine tick every 6px, a tall one every 36px. It scrolls with
-   the stations (background-attachment: local), so turning the dial moves the scale under the needle. */
+/* The frequency scale along the whole dial (light marks on the dark dial window): a fine tick every 6px, a
+   tall one every 36px. It scrolls with the stations (background-attachment: local), so turning the dial moves
+   the scale under the needle. */
 .dial-scale {
   background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--ink) 75%, transparent) 1.5px, transparent 1.5px),
-    linear-gradient(to right, color-mix(in srgb, var(--ink) 55%, transparent) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--on-bar) 85%, transparent) 1.5px, transparent 1.5px),
+    linear-gradient(to right, color-mix(in srgb, var(--on-bar) 60%, transparent) 1px, transparent 1px);
   background-size: 36px 24px, 6px 12px;
   background-position: 0 6px, 0 6px;
   background-repeat: repeat-x;
@@ -144,6 +145,27 @@ body {
 }
 .logo-frame > img[data-broken] {
   display: none;
+}
+/* While a logo loads, its frame pulses like the other skeletons. */
+.logo-frame:has(> img:not([data-loaded])) {
+  animation: skeleton 0.8s ease-in-out infinite alternate;
+}
+.logo-frame > img:not([data-loaded]) {
+  background: transparent;
+}
+
+/* Loading placeholders (v1 pulsed its loading cards the same way). */
+.skeleton {
+  background: var(--paper-3);
+  animation: skeleton 0.8s ease-in-out infinite alternate;
+}
+@keyframes skeleton {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.45;
+  }
 }
 
 /* The playing indicator: three bars, still when the visitor prefers less motion. */
@@ -178,6 +200,10 @@ body {
   .eq > i {
     animation: none;
     height: 70%;
+  }
+  .skeleton,
+  .logo-frame:has(> img:not([data-loaded])) {
+    animation: none;
   }
   html {
     scroll-behavior: auto;

@@ -20,10 +20,17 @@ site where every country, genre, language and station has its own address, plus 
   `/robots.txt`, `/manifest.webmanifest`, 301s from v1 addresses and from alternate slugs
   (`/country/in` → `/country/india`), real 404s, `noindex` on search results and re-sorted lists, internal
   links between related countries, genres and languages.
-- **Visitor dashboard** at `/stats` (password): see below.
+- **Visitor dashboard** at `/dashboard` (password): see below.
+- **The dial (home page):** countries on a lit radio dial with a red needle. Grab and drag it with the mouse,
+  swipe it, or use the arrow buttons or arrow keys; the country that comes to rest under the needle is tuned and
+  its stations are listed below, on the same page, with the address updated to `/?country=<slug>` (Back and
+  shared links work, like v1's `pushState` search). It opens on the visitor's own country.
+- **Station cards:** the whole card opens the station page in place; Cmd/Ctrl-click opens a new tab.
+- **Skeletons:** pulsing placeholders while a page, a list page or the dial's stations load (still when the
+  visitor prefers less motion), like v1's loading cards.
 - **Design:** "tuning dial in print": warm paper, black ink, one red needle; Fraunces / Instrument Sans /
-  IBM Plex Mono, self-hosted (no Google Fonts call). The home page dial lists countries on a frequency scale.
-  Dark scheme follows the device. Text colours meet WCAG 2.2 AA (body ~14:1, muted ≥ 5:1, red text 5.5:1).
+  IBM Plex Mono, self-hosted (no Google Fonts call). Dark scheme follows the device. Every text and control
+  colour meets WCAG 2.2 AA in both schemes: `node scripts/contrast.mjs` measures them (dial text 8.6–16:1).
   The logo was traced from an AI-generated raster into a 600-byte SVG (`public/icon.svg`, `public/favicon.svg`).
 
 ## Run it locally
@@ -41,11 +48,13 @@ Checks:
 npm run typecheck
 bash scripts/smoke.sh http://localhost:5173        # every page type: status, title, canonical
 node scripts/nav-check.mjs http://localhost:5173   # no reloads between pages, player keeps playing
+node scripts/dial-check.mjs http://localhost:5173  # dial drag/click/keys, card links, back button, skeletons
 node scripts/shots.mjs http://localhost:5173       # headless screenshots into .smoke/
+node scripts/contrast.mjs                          # WCAG 2.2 contrast of every colour pair, both schemes
 npm run preview                                    # the production build in the Workers runtime
 ```
 
-(The two `.mjs` scripts need the `playwright` package; they run headless.)
+(The browser scripts need the `playwright` package; they run headless.)
 
 ## How it works
 
@@ -58,7 +67,7 @@ npm run preview                                    # the production build in the
   custom domain, not on `*.workers.dev`.
 - Stats: Cloudflare D1 (SQLite), tables in `migrations/0001_stats.sql`.
 
-## The visitor dashboard (`/stats`)
+## The visitor dashboard (`/dashboard`)
 
 Answers "do real people come, and do they listen?":
 
@@ -75,7 +84,7 @@ Answers "do real people come, and do they listen?":
 an automated/remote-controlled browser or a hosting company's network. No cookies and no IP addresses are
 stored; a random id in the visitor's browser tells new from returning visitors (session-only when the browser
 sends Global Privacy Control). Anyone can switch counting off for their browser on `/privacy`; switch it off
-in your own browsers on `/stats` so your visits don't count.
+in your own browsers on `/dashboard` so your visits don't count.
 
 ## Going live (all on free plans)
 

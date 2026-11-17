@@ -9,8 +9,10 @@ import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { PlayerBar } from "./components/PlayerBar";
 import { SearchBox } from "./components/SearchBox";
+import { PageSkeleton } from "./components/Skeleton";
 import { Container } from "./components/ui";
 import { startAnalytics, track } from "./lib/analytics.client";
+import { usePageLoading } from "./lib/pending";
 import { browserMirror } from "./lib/radio.server";
 import { seo } from "./lib/seo";
 import { PlayerProvider } from "./player/player";
@@ -42,6 +44,16 @@ export function meta({ error }: Route.MetaArgs) {
 }
 
 let lastTrackedKey = "";
+let lastView = "";
+
+/** The page a location shows. Turning the home page dial only changes ?country=, which is not a new page. */
+function viewOf(pathname: string, search: string): string {
+  if (pathname !== "/") return pathname + search;
+  const params = new URLSearchParams(search);
+  params.delete("country");
+  const rest = params.toString();
+  return rest ? `/?${rest}` : "/";
+}
 
 /** Counts page views (History API navigations included) for the anonymous visit counter. */
 function PageViews() {
@@ -52,8 +64,11 @@ function PageViews() {
   useEffect(() => {
     if (location.key === lastTrackedKey) return;
     lastTrackedKey = location.key;
-    if (location.pathname.startsWith("/stats")) return;
-    track("pageview", { path: location.pathname + location.search });
+    const view = viewOf(location.pathname, location.search);
+    if (view === lastView && location.pathname === "/") return;
+    lastView = view;
+    if (location.pathname.startsWith("/dashboard")) return;
+    track("pageview", { path: view });
   }, [location.key, location.pathname, location.search]);
   return null;
 }
@@ -89,7 +104,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  // While another page loads, its skeleton stands in (the player keeps playing: it lives in Layout).
+  const loading = usePageLoading();
+  useEffect(() => {
+    if (loading) window.scrollTo(0, 0);
+  }, [loading]);
+  return loading ? <PageSkeleton /> : <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

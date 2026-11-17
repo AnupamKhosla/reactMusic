@@ -15,11 +15,11 @@ export default [
   route("favorites", "routes/favorites.tsx"),
   route("about", "routes/about.tsx"),
   route("privacy", "routes/privacy.tsx"),
-  route("stats", "routes/stats.tsx"),
+  route("dashboard", "routes/dashboard.tsx"),
   route("robots.txt", "routes/robots.ts"),
   route("sitemap.xml", "routes/sitemap-index.ts"),
   route("sitemaps/:file", "routes/sitemap.ts"),
   route("manifest.webmanifest", "routes/manifest.ts"),
   route("api/collect", "routes/api.collect.ts"),
-  route("api/near", "routes/api.near.ts"),
+  route("api/country/:slug", "routes/api.country.ts"),
 ] satisfies RouteConfig;

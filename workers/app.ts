@@ -4,8 +4,8 @@ import { crawlerName, recordCrawl } from "../app/lib/analytics.server";
 const requestHandler = createRequestHandler(() => import("virtual:react-router/server-build"), import.meta.env.MODE);
 
 // Pages kept at the edge so most visits cost no rendering (the free plan allows 10 ms of CPU per request).
-// Only pages whose Cache-Control has s-maxage are stored; the dashboard and the APIs never are.
-const NEVER_CACHE = /^\/(api\/|stats)/;
+// Only pages whose Cache-Control has s-maxage are stored; the dashboard and the visit counter never are.
+const NEVER_CACHE = /^\/(api\/collect|dashboard)/;
 // Ad and campaign tags don't change the page: one cached copy serves them all.
 const IGNORED_PARAMS = /^(utm_[a-z]+|fbclid|gclid|msclkid|ref)$/;
 
@@ -19,10 +19,15 @@ async function version(): Promise<string> {
   return buildVersion;
 }
 
-async function cacheKey(url: URL): Promise<Request> {
+async function cacheKey(url: URL, country: string): Promise<Request> {
   const key = new URL(url);
   for (const name of [...key.searchParams.keys()]) if (IGNORED_PARAMS.test(name)) key.searchParams.delete(name);
   key.searchParams.set("__build", await version());
+  // Without ?country= the home page (and its data for in-app visits) lists the visitor's own country's
+  // stations: one cached copy per country.
+  if ((url.pathname === "/" || url.pathname === "/_root.data") && !key.searchParams.has("country")) {
+    key.searchParams.set("__cc", country);
+  }
   key.searchParams.sort();
   return new Request(key.toString(), { method: "GET" });
 }
@@ -47,7 +52,7 @@ export default {
       !import.meta.env.DEV && request.method === "GET" && !NEVER_CACHE.test(url.pathname) && !request.headers.has("Authorization");
     const cache = (globalThis as unknown as { caches?: { default?: Cache } }).caches?.default;
     if (cacheable && cache) {
-      const key = await cacheKey(url);
+      const key = await cacheKey(url, String(request.cf?.country ?? ""));
       const hit = await cache.match(key);
       if (hit) {
         const response = new Response(hit.body, hit);

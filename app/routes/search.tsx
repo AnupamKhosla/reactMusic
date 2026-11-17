@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { Link } from "react-router";
 import type { Route } from "./+types/search";
 import { SearchBox } from "~/components/SearchBox";
+import { SkeletonGrid } from "~/components/Skeleton";
 import { StationGrid } from "~/components/StationCard";
+import { useListLoading } from "~/lib/pending";
 import { Chips, Container, Notice, PageHeading, Section } from "~/components/ui";
 import { track } from "~/lib/analytics.client";
 import { PER_PAGE, parsePage, toCard } from "~/lib/lists";
@@ -40,6 +42,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 export default function Search({ loaderData }: Route.ComponentProps) {
   const { q, page, hasNext, stations, matches } = loaderData;
+  const listLoading = useListLoading();
   useEffect(() => {
     if (q.length >= 2 && page === 1) track("search", { label: q.toLowerCase(), value: stations.length });
   }, [q, page, stations.length]);
@@ -56,7 +59,11 @@ export default function Search({ loaderData }: Route.ComponentProps) {
           <Chips items={matches} label="Matching countries, genres and languages" />
         </div>
       ) : null}
-      {q.length >= 2 ? (
+      {listLoading ? (
+        <Section title="Searching">
+          <SkeletonGrid label="Searching" />
+        </Section>
+      ) : q.length >= 2 ? (
         <Section title={stations.length ? "Stations" : "No stations found"}>
           {stations.length ? (
             <StationGrid stations={stations} label="Search results" />

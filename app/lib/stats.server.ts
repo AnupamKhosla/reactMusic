@@ -1,4 +1,4 @@
-// The numbers on /stats. "Real people" = visits with a real tap, click, key press or scroll, from a normal
+// The numbers on /dashboard. "Real people" = visits with a real tap, click, key press or scroll, from a normal
 // browser (not a known bot, an automated browser or a hosting company's network).
 import { utcDay } from "./analytics.server";
 

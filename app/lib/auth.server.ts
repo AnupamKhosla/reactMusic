@@ -1,4 +1,4 @@
-// The owner's login for /stats: one password (the STATS_PASSWORD secret), remembered in an HttpOnly cookie
+// The owner's login for /dashboard: one password (the STATS_PASSWORD secret), remembered in an HttpOnly cookie
 // that holds an HMAC of the password, never the password itself.
 import { env } from "cloudflare:workers";
 
@@ -49,9 +49,9 @@ export async function login(request: Request, attempt: string): Promise<string |
     return null;
   }
   const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
-  return `${COOKIE}=${await token(password())}; Path=/stats; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}${secure}`;
+  return `${COOKIE}=${await token(password())}; Path=/dashboard; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}${secure}`;
 }
 
 export function logoutCookie(): string {
-  return `${COOKIE}=; Path=/stats; HttpOnly; SameSite=Strict; Max-Age=0`;
+  return `${COOKIE}=; Path=/dashboard; HttpOnly; SameSite=Strict; Max-Age=0`;
 }

@@ -15,9 +15,10 @@
 	},
 	"d1_databases": [
 		{
-			// Visitor statistics for the /stats dashboard (anonymous, no IP addresses stored).
+			// Visitor statistics for the /dashboard page (anonymous, no IP addresses stored).
 			"binding": "DB",
 			"database_name": "liveradio",
+			"database_id": "5f4546ab-1b96-4461-8269-1eb867d1b013",
 			"migrations_dir": "migrations"
 		}
 	],

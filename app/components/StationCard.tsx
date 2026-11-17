@@ -5,6 +5,7 @@ import { isFavorite, toggleFavorite, useFavorites } from "~/lib/storage";
 import type { SavedStation, Station } from "~/lib/types";
 import { usePlayer } from "~/player/player";
 import { HeartIcon, PauseIcon, PlayIcon, SpinnerIcon } from "./Icons";
+import { GRID } from "./Skeleton";
 import { StationLogo } from "./StationLogo";
 
 type AnyStation = Station | SavedStation;
@@ -58,6 +59,8 @@ export function FavoriteButton({ station, className = "" }: { station: AnyStatio
   );
 }
 
+// The whole card opens the station's own page (in place, through the History API; Cmd/Ctrl-click or the
+// middle button opens it in a new tab). The play and heart buttons sit above that link.
 export function StationCard({ station, queue, eager }: { station: AnyStation; queue?: AnyStation[]; eager?: boolean }) {
   const player = usePlayer();
   const current = player.station?.id === station.id;
@@ -66,17 +69,22 @@ export function StationCard({ station, queue, eager }: { station: AnyStation; qu
   const meta = [station.countrycode, station.tags[0]].filter(Boolean).join(" · ");
   return (
     <li
-      className={`relative flex min-w-0 flex-col gap-3 rounded-lg border bg-paper p-3 transition-colors ${
+      className={`group/card relative flex min-w-0 flex-col gap-3 rounded-lg border bg-paper p-3 transition-colors hover:bg-paper-2 ${
         current ? "border-red shadow-[inset_0_0_0_1px_var(--red)]" : "border-line"
       }`}
     >
       <div className="flex items-start justify-between gap-2">
         <StationLogo name={station.name} src={station.favicon} size={56} eager={eager} />
-        <PlayButton station={station} queue={queue} />
+        <div className="relative z-10">
+          <PlayButton station={station} queue={queue} />
+        </div>
       </div>
       <div className="min-w-0">
         <h3 className="line-clamp-2 text-[0.95rem] leading-snug font-semibold">
-          <Link to={paths.station(station)} prefetch="intent" className="hover:underline focus-visible:underline">
+          <Link
+            to={paths.station(station)}
+            className="group-hover/card:underline after:absolute after:inset-0 after:rounded-lg after:content-[''] focus-visible:outline-none focus-visible:after:outline-[3px] focus-visible:after:outline-offset-2 focus-visible:after:outline-[var(--focus)] focus-visible:after:outline-solid"
+          >
             {station.name}
           </Link>
         </h3>
@@ -101,7 +109,7 @@ export function StationCard({ station, queue, eager }: { station: AnyStation; qu
             " "
           )}
         </span>
-        <FavoriteButton station={station} className="-mr-2 -mb-2" />
+        <FavoriteButton station={station} className="relative z-10 -mr-2 -mb-2" />
       </div>
     </li>
   );
@@ -110,7 +118,7 @@ export function StationCard({ station, queue, eager }: { station: AnyStation; qu
 export function StationGrid({ stations, label, eagerCount = 6 }: { stations: AnyStation[]; label?: string; eagerCount?: number }) {
   if (stations.length === 0) return null;
   return (
-    <ul aria-label={label} className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <ul aria-label={label} className={GRID}>
       {stations.map((s, i) => (
         <StationCard key={s.id} station={s} queue={stations} eager={i < eagerCount} />
       ))}

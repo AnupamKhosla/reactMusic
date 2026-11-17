@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
-import type { Route } from "./+types/stats";
+import type { Route } from "./+types/dashboard";
 import { CountMeToggle } from "~/components/CountMeToggle";
 import { Container } from "~/components/ui";
 import { hasPassword, isOwner, login, logoutCookie } from "~/lib/auth.server";
@@ -33,10 +33,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
-  if (form.get("intent") === "logout") return redirect("/stats", { headers: { "Set-Cookie": logoutCookie() } });
+  if (form.get("intent") === "logout") return redirect("/dashboard", { headers: { "Set-Cookie": logoutCookie() } });
   const cookie = await login(request, String(form.get("password") ?? ""));
   if (!cookie) return data({ error: "That password is not right." }, { status: 401 });
-  return redirect("/stats", { headers: { "Set-Cookie": cookie } });
+  return redirect("/dashboard", { headers: { "Set-Cookie": cookie } });
 }
 
 function duration(secs: number): string {
@@ -199,7 +199,7 @@ function DashboardView({ d }: { d: Dashboard }) {
           {RANGES.map((r) => (
             <Link
               key={r.days}
-              to={`/stats?days=${r.days}`}
+              to={`/dashboard?days=${r.days}`}
               aria-current={r.days === d.days ? "page" : undefined}
               className={`caps rounded-full border px-3.5 py-2 ${r.days === d.days ? "border-ink bg-ink text-paper" : "border-line hover:bg-paper-2"}`}
             >

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { SortKey } from "~/lib/lists";
+import { useListLoading } from "~/lib/pending";
 import type { CardStation } from "~/lib/types";
+import { SkeletonGrid } from "./Skeleton";
 import { StationGrid } from "./StationCard";
 import { Breadcrumbs, Chips, Container, Notice, PageHeading, Pagination, Section, SortTabs, type ChipItem } from "./ui";
 
@@ -31,6 +33,7 @@ export function StationListPage({
   related?: Related[];
   empty?: ReactNode;
 }) {
+  const listLoading = useListLoading();
   return (
     <Container>
       <Breadcrumbs items={crumbs} />
@@ -40,7 +43,9 @@ export function StationListPage({
       <div className="mt-8 mb-5">
         <SortTabs base={base} current={sort} />
       </div>
-      {stations.length > 0 ? (
+      {listLoading ? (
+        <SkeletonGrid count={Math.min(stations.length || 12, 24)} />
+      ) : stations.length > 0 ? (
         <StationGrid stations={stations} label="Stations" />
       ) : (
         <Notice title="No stations here right now">{empty ?? "Every station on this list is off air at the moment. Try another one."}</Notice>

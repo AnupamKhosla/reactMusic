@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/countries";
-import { TuningDial } from "~/components/TuningDial";
 import { Breadcrumbs, Container, PageHeading } from "~/components/ui";
 import { formatCount, paths } from "~/lib/names";
 import { cacheFor, guard } from "~/lib/pages.server";
@@ -40,12 +39,12 @@ export default function Countries({ loaderData }: Route.ComponentProps) {
     <Container>
       <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: "Countries" }]} />
       <PageHeading kicker={<><span className="num">{countries.length}</span> countries</>} title="Radio by country">
-        <p>Every country with a live station on air. The most listened-to countries are on the dial; all of them are listed A to Z below.</p>
+        <p>
+          Every country with a live station on air, A to Z. Or turn the <Link to="/" className="underline">dial on the home page</Link> to hear what's
+          popular in each one.
+        </p>
       </PageHeading>
-      <div className="mt-8">
-        <TuningDial countries={countries.slice(0, 40)} label="Most listened-to countries" />
-      </div>
-      <nav aria-label="Jump to a letter" className="mt-12 flex flex-wrap gap-1">
+      <nav aria-label="Jump to a letter" className="mt-10 flex flex-wrap gap-1">
         {[...groups.keys()].map((letter) => (
           <a key={letter} href={`#letter-${letter}`} className="num grid h-9 w-9 place-items-center rounded border border-line hover:bg-ink hover:text-paper">
             {letter}

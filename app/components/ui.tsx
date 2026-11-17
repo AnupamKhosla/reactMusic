@@ -26,7 +26,7 @@ export function Section({ title, action, children, id }: { title: string; action
 
 export function MoreLink({ to, children }: { to: string; children: ReactNode }) {
   return (
-    <Link to={to} prefetch="intent" className="caps inline-flex flex-none items-center gap-1.5 text-red-ink hover:underline">
+    <Link to={to} prefetch="intent" className="caps inline-flex flex-none items-center gap-1.5 font-medium text-red-ink hover:underline">
       {children} <ArrowRightIcon size={14} />
     </Link>
   );
@@ -80,7 +80,7 @@ export function Breadcrumbs({ items }: { items: { name: string; path?: string }[
 export function PageHeading({ kicker, title, children }: { kicker?: ReactNode; title: ReactNode; children?: ReactNode }) {
   return (
     <div className="pt-6 pb-2">
-      {kicker ? <p className="caps mb-3 text-red-ink">{kicker}</p> : null}
+      {kicker ? <p className="caps mb-3 font-medium text-ink-2">{kicker}</p> : null}
       <h1 className="display text-[2.6rem] sm:text-[3.6rem] lg:text-[4.4rem]">{title}</h1>
       {children ? <div className="mt-4 max-w-2xl text-lg text-ink-2">{children}</div> : null}
     </div>

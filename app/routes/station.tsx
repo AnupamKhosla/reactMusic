@@ -12,13 +12,15 @@ import { cacheFor, guard, notFound } from "~/lib/pages.server";
 import { getCountries, getGenres, getLanguages, searchStations, stationById } from "~/lib/radio.server";
 import { absolute, breadcrumbLd, LIST_CACHE, seo } from "~/lib/seo";
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+export async function loader({ params }: Route.LoaderArgs) {
   const id = stationIdFromSlug(params.slug);
   if (!id) notFound();
   const station = await guard(() => stationById(id));
   if (!station) notFound();
+  // Old or misspelt names in the address go to the station's one address. Compare the slug, not the request
+  // path: in-app visits load data from "<path>.data", which never equals the page's path.
   const canonical = paths.station(station);
-  if (new URL(request.url).pathname !== canonical) throw redirect(canonical, 301);
+  if (`/station/${params.slug}` !== canonical) throw redirect(canonical, 301);
 
   const [countries, genres, languages] = await guard(() => Promise.all([getCountries(), getGenres(), getLanguages()]));
   const country = countries.find((c) => c.code === station.countrycode) ?? null;

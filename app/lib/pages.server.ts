@@ -37,6 +37,15 @@ export async function loadStationPage(request: Request, query: Omit<StationQuery
   };
 }
 
+/** How many of a country's stations the home page lists under the dial. */
+export const TUNED_COUNT = 24;
+
+/** The stations listed under the home page dial for one country: its most listened to today. */
+export async function tunedStations(countrycode: string) {
+  const stations = await searchStations({ countrycode, order: "clickcount", limit: TUNED_COUNT });
+  return stations.map(toCard);
+}
+
 /** Cache-Control for a page: errors are never cached. */
 export function cacheFor(value: string) {
   return ({ errorHeaders }: { errorHeaders?: Headers }) => (errorHeaders ? { "Cache-Control": "no-store" } : { "Cache-Control": value });

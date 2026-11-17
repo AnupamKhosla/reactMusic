@@ -5,7 +5,7 @@ export function loader() {
     "User-agent: *",
     "Allow: /",
     "Disallow: /api/",
-    "Disallow: /stats",
+    "Disallow: /dashboard",
     "",
     `Sitemap: ${SITE_URL}/sitemap.xml`,
     "",

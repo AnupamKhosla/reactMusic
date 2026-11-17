@@ -38,7 +38,7 @@ check "/search?q=bbc" 200
 check /favorites 200
 check /about 200
 check /privacy 200
-check /stats 200
+check /dashboard 200
 check /robots.txt 200
 check /sitemap.xml 200
 check /sitemaps/countries.xml 200

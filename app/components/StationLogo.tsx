@@ -5,15 +5,19 @@ import { initials } from "~/lib/names";
 export function StationLogo({ name, src, size = 56, eager = false }: { name: string; src: string; size?: number; eager?: boolean }) {
   const ref = useRef<HTMLImageElement>(null);
   const [broken, setBroken] = useState(!src);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setBroken(!src);
+    setLoaded(false);
   }, [src]);
 
-  // An image that failed before the page became interactive never fires onError in React: check it here.
+  // An image that loaded or failed before the page became interactive fires no React event: check it here.
   useEffect(() => {
     const img = ref.current;
-    if (img && img.complete && img.naturalWidth === 0) setBroken(true);
+    if (!img || !img.complete) return;
+    if (img.naturalWidth === 0) setBroken(true);
+    else if (img.naturalWidth >= 8) setLoaded(true);
   }, [src]);
 
   return (
@@ -31,10 +35,12 @@ export function StationLogo({ name, src, size = 56, eager = false }: { name: str
           loading={eager ? "eager" : "lazy"}
           decoding="async"
           referrerPolicy="no-referrer"
+          data-loaded={loaded ? "" : undefined}
           onError={() => setBroken(true)}
           onLoad={(e) => {
             // Some sites answer with a 1x1 pixel instead of an error.
             if (e.currentTarget.naturalWidth < 8) setBroken(true);
+            else setLoaded(true);
           }}
         />
       ) : null}
