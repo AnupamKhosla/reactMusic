@@ -1,0 +1,30 @@
+/**
+ * LiveRadio on Cloudflare Workers (free plan).
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ *
+ * Deploy steps (owner): see README.md, "Going live".
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "liveradio",
+	"compatibility_date": "2026-11-17",
+	"main": "./workers/app.ts",
+	"vars": {
+		// The site's public address: canonical links, sitemaps and social cards use it.
+		"SITE_URL": "https://liveradio.space"
+	},
+	"d1_databases": [
+		{
+			// Visitor statistics for the /stats dashboard (anonymous, no IP addresses stored).
+			"binding": "DB",
+			"database_name": "liveradio",
+			"migrations_dir": "migrations"
+		}
+	],
+	"observability": {
+		"enabled": true
+	},
+	"upload_source_maps": true
+	// Custom domain, once liveradio.space uses Cloudflare's nameservers (README.md, "Going live"):
+	// "routes": [{ "pattern": "liveradio.space", "custom_domain": true }, { "pattern": "www.liveradio.space", "custom_domain": true }]
+}

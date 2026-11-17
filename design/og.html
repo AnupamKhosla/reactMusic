@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "Fraunces"; font-weight: 100 900; src: url(../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Instrument"; font-weight: 400 700; src: url(../node_modules/@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Plex"; font-weight: 500; src: url(../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2) format("woff2"); }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1200px; height: 630px; background: #f3eee3; color: #16130f; font-family: Instrument; position: relative; overflow: hidden; }
+  .top { position: absolute; left: 64px; top: 52px; display: flex; align-items: center; gap: 16px; }
+  .word { font-family: Fraunces; font-weight: 800; font-size: 40px; letter-spacing: -0.02em; }
+  .kicker { position: absolute; right: 64px; top: 66px; font-family: Plex; font-size: 20px; letter-spacing: 0.08em; text-transform: uppercase; color: #b42d15; }
+  h1 { position: absolute; left: 60px; top: 136px; font-family: Fraunces; font-weight: 800; font-size: 150px; line-height: 0.9; letter-spacing: -0.03em; text-transform: uppercase; }
+  .dial { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; background: #e9e2d2; border-top: 3px solid #16130f; }
+  .ticks { position: absolute; left: 0; right: 0; top: 0; height: 34px;
+    background-image: repeating-linear-gradient(to right, #16130f 0 2px, transparent 2px 60px), repeating-linear-gradient(to right, #16130f 0 1px, transparent 1px 12px);
+    background-size: 100% 34px, 100% 18px; background-repeat: repeat-x; background-position: 0 0, 0 0; opacity: .75; }
+  .codes { position: absolute; left: 0; right: 0; top: 56px; display: flex; justify-content: space-around; font-family: Plex; font-size: 22px; }
+  .codes { z-index: 2; }
+  .codes span { border: 1.5px solid #16130f; border-radius: 5px; padding: 3px 8px; background: #e9e2d2; }
+  .codes span.on { background: #d9381e; border-color: #d9381e; color: #fff; }
+  .needle { position: absolute; left: 50%; top: -18px; bottom: 0; width: 5px; margin-left: -2px; background: #d9381e; }
+  .needle::before { content: ""; position: absolute; left: -11px; top: -14px; border: 13px solid transparent; border-top: 18px solid #d9381e; }
+  .sub { position: absolute; left: 64px; bottom: 96px; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <svg width="54" height="54" viewBox="0 0 512 512"><rect width="512" height="512" rx="98" fill="#16130f"/><g fill="#f3eee3"><rect x="64" y="176" width="44" height="176" rx="22"/><rect x="152" y="232" width="44" height="88" rx="22"/><rect x="340" y="232" width="44" height="88" rx="22"/><rect x="420" y="176" width="44" height="176" rx="22"/></g><g fill="#d9381e"><rect x="236" y="164" width="44" height="268" rx="22"/><path d="M196 72h124l-62 88z"/></g></svg>
+    <span class="word">LiveRadio</span>
+  </div>
+  <p class="kicker">Free · No sign-up · On air now</p>
+  <h1>Tune into<br>the world.</h1>
+  <div class="dial">
+    <div class="ticks"></div>
+    <div class="codes"><span>US</span><span>GB</span><span>DE</span><span>FR</span><span>BR</span><span class="on">IN</span><span>JP</span><span>MX</span><span>NG</span><span>AU</span><span>ES</span></div>
+    <div class="needle"></div>
+  </div>
+</body>
+</html>
