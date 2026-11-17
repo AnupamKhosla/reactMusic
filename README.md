@@ -104,9 +104,12 @@ State on 2026-11-17:
 4. **Owner:** the dashboard password: `npm run set-password`. A Mac dialog asks for it twice with the typing
    hidden (8+ characters) and saves it on Cloudflare as the Worker's `STATS_PASSWORD` secret; it is never printed
    or stored in the repo. Run it again any time to change the password. Until it is set, `/dashboard` stays locked.
-5. Once the zone shows "Active" in Cloudflare: check the site, then turn off GitHub Pages for the old repo, and
-   submit `https://liveradio.space/sitemap.xml` in Google Search Console (the domain is already verified there
-   by its TXT record).
+5. Done, 17 Nov: the zone is active and the site is live (smoke test passes on liveradio.space; www and http
+   301 to https://liveradio.space). In Google Search Console (domain property, verified by its TXT record)
+   `https://liveradio.space/sitemap.xml` is submitted (status Success), and indexing was requested for `/`,
+   `/countries`, `/genres`, `/languages` and `/top`.
+6. Left, on the owner's yes: turn off GitHub Pages for the old repo (nothing reaches it once DNS caches expire;
+   it's only cleanup).
 
 ### Sitemap stages (owner, 2026-11-17)
 

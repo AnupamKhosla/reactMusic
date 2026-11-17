@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 # Checks that every kind of page answers with the right status and has a title, a description and a canonical link.
-# Usage: scripts/smoke.sh [base]   (default http://localhost:5173)
+# Usage: scripts/smoke.sh [base] [ip]   (default http://localhost:5173)
+# With an ip, every request goes to that address (curl --resolve), e.g. Cloudflare's while DNS caches still hold
+# an old one: scripts/smoke.sh https://liveradio.space 104.21.76.8
 set -u
 BASE="${1:-http://localhost:5173}"
+RESOLVE=()
+if [ -n "${2:-}" ]; then
+  host="${BASE#*://}"
+  RESOLVE=(--resolve "${host%%/*}:443:$2")
+fi
 OUT="$(dirname "$0")/../.smoke"
 mkdir -p "$OUT"
 fail=0
@@ -11,7 +18,7 @@ check() { # path expected-status
   local path="$1" want="$2" file
   file="$OUT/$(echo "$path" | tr '/?=&' '____').html"
   local got
-  got=$(curl -s -o "$file" -w "%{http_code}" "$BASE$path")
+  got=$(curl -s "${RESOLVE[@]+"${RESOLVE[@]}"}" -o "$file" -w "%{http_code}" "$BASE$path")
   local title canon
   title=$(grep -o -m1 '<title>[^<]*</title>' "$file" | sed 's/<[^>]*>//g')
   canon=$(grep -o -m1 'rel="canonical" href="[^"]*"' "$file" | sed 's/.*href="//; s/"$//')
