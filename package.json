@@ -11,6 +11,7 @@
     "cf-typegen": "wrangler types",
     "db:local": "wrangler d1 migrations apply liveradio --local",
     "db:remote": "wrangler d1 migrations apply liveradio --remote",
+    "set-password": "node scripts/set-password.mjs",
     "postinstall": "wrangler types"
   },
   "dependencies": {
