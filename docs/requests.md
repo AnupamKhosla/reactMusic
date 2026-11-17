@@ -2,6 +2,16 @@
 
 Newest first. Status: open / done / waiting (on the owner).
 
+## 2026-11-17 (after go-live) — for later, not bugs
+
+Owner: "not a bug no light theme and the design is typical opus styling not original. we will fix these later just
+note em".
+
+- open: no light theme. The site only follows the device's light/dark setting, so on a dark-mode device there is
+  no way to see or choose the light look. Give the visitor a light theme they can pick.
+- open: the design reads as typical AI-model ("Opus") styling, not original. LiveRadio needs its own original
+  look, not the generic one this build has.
+
 ## 2026-11-17 (after the first v2 look)
 
 - done (submitted in Search Console 17 Nov, status Success; indexing requested for /, /countries, /genres,
