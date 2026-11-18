@@ -1,21 +1,24 @@
-// The owner's login for /dashboard: one password (the STATS_PASSWORD secret), remembered in an HttpOnly cookie
-// that holds an HMAC of the password, never the password itself.
+// The owner's login for /dashboard: a username and a password (the STATS_USERNAME and STATS_PASSWORD secrets, set
+// with `npm run set-password`), remembered in an HttpOnly cookie that holds an HMAC of both, never either one.
 import { env } from "cloudflare:workers";
 
 const COOKIE = "lr_stats";
 
-function password(): string {
-  const value = (env as unknown as { STATS_PASSWORD?: string }).STATS_PASSWORD;
+function secret(name: "STATS_USERNAME" | "STATS_PASSWORD"): string {
+  const value = (env as unknown as Record<string, unknown>)[name];
   return typeof value === "string" ? value : "";
 }
+const username = () => secret("STATS_USERNAME");
+const password = () => secret("STATS_PASSWORD");
 
 export function hasPassword(): boolean {
-  return password().length >= 8;
+  return username().length >= 3 && password().length >= 8;
 }
 
-async function token(secret: string): Promise<string> {
-  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode("liveradio-stats-v1"));
+async function token(pass: string): Promise<string> {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  // The username is part of the signed text, so changing either one signs every browser out.
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`liveradio-stats-v2:${username()}`));
   return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
@@ -41,9 +44,12 @@ export async function isOwner(request: Request): Promise<boolean> {
   return value.length > 0 && sameText(value, await token(password()));
 }
 
-/** Returns the Set-Cookie header for a correct password, or null. */
-export async function login(request: Request, attempt: string): Promise<string | null> {
-  if (!hasPassword() || !sameText(attempt, password())) {
+/** Returns the Set-Cookie header for a correct username and password, or null. */
+export async function login(request: Request, user: string, attempt: string): Promise<string | null> {
+  // Both are compared every time (no early exit), so a wrong username takes as long as a wrong password.
+  const userOk = sameText(user.trim(), username());
+  const passOk = sameText(attempt, password());
+  if (!hasPassword() || !userOk || !passOk) {
     // Slow down guessing a little (waiting costs no CPU time on Workers).
     await new Promise((r) => setTimeout(r, 1200));
     return null;

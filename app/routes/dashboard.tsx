@@ -38,8 +38,8 @@ export async function action({ request }: Route.ActionArgs) {
     for (const cookie of logoutCookies()) headers.append("Set-Cookie", cookie);
     return redirect("/dashboard", { headers });
   }
-  const cookie = await login(request, String(form.get("password") ?? ""));
-  if (!cookie) return data({ error: "That password is not right." }, { status: 401 });
+  const cookie = await login(request, String(form.get("username") ?? ""), String(form.get("password") ?? ""));
+  if (!cookie) return data({ error: "That username or password is not right." }, { status: 401 });
   return redirect("/dashboard", { headers: { "Set-Cookie": cookie } });
 }
 
@@ -313,15 +313,30 @@ export default function Stats({ loaderData, actionData }: Route.ComponentProps) 
       <h1 className="display pt-8 text-[2.8rem] sm:text-[3.6rem]">Visitors</h1>
       {loaderData.state === "setup" ? (
         <div className="mt-6 max-w-xl rounded-xl border-2 border-dashed border-line p-6">
-          <p className="font-semibold">The dashboard has no password yet.</p>
+          <p className="font-semibold">The dashboard has no username and password yet.</p>
           <p className="mt-2 text-ink-2">
-            Set one (8 characters or more) as the <code className="num">STATS_PASSWORD</code> secret of the site, then reload this page. Visits are
-            already being counted.
+            Set them with <code className="num">npm run set-password</code> (a username of 3 characters or more and a password of 8 or more), then
+            reload this page. Visits are already being counted.
           </p>
         </div>
       ) : loaderData.state === "login" ? (
         <Form method="post" className="mt-6 max-w-sm">
-          <label htmlFor="stats-password" className="block font-semibold">
+          <label htmlFor="stats-username" className="block font-semibold">
+            Username
+          </label>
+          <input
+            id="stats-username"
+            name="username"
+            type="text"
+            required
+            autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            className="mt-2 h-12 w-full rounded-lg border-2 border-line bg-paper px-3"
+            aria-describedby={actionData?.error ? "stats-error" : undefined}
+          />
+          <label htmlFor="stats-password" className="mt-4 block font-semibold">
             Password
           </label>
           <input
