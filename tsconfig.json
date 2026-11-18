@@ -1,14 +1,18 @@
+// Browser code, shared templates and Node scripts. The Worker has its own check (tsconfig.worker.json): Cloudflare's
+// runtime types and the browser's DOM types define some of the same names differently.
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.cloudflare.json" }
-  ],
+  "include": ["src/client/**/*", "src/shared/**/*", "scripts/**/*.ts"],
   "compilerOptions": {
-    "checkJs": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true,
     "strict": true,
-    "noEmit": true
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["vite/client", "node"],
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler"
   }
 }

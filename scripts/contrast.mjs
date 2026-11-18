@@ -1,10 +1,10 @@
-// WCAG 2.2 contrast of the colour pairs the site uses, read from app/app.css (light and dark schemes).
+// WCAG 2.2 contrast of the colour pairs the site uses, read from src/styles.css (light and dark schemes).
 // Usage: node scripts/contrast.mjs   -> prints every pair; exits 1 if any falls below its minimum.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const css = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "app", "app.css"), "utf8");
+const css = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "src", "styles.css"), "utf8");
 const block = (re) => Object.fromEntries([...(css.match(re)?.[1] ?? "").matchAll(/--([\w-]+):\s*(#[0-9a-f]{6})/gi)].map((m) => [m[1], m[2]]));
 const light = block(/:root\s*{([^}]*)}/);
 const dark = { ...light, ...block(/prefers-color-scheme: dark\)\s*{\s*:root\s*{([^}]*)}/) };

@@ -3,7 +3,9 @@
 /node_modules/
 *.tsbuildinfo
 
-# React Router
+# Build output (npm run build, npm run build:static) and scratch files
+/dist/
+/tmp/
 /.react-router/
 /build/
 

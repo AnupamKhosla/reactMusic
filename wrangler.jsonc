@@ -8,7 +8,12 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "liveradio",
 	"compatibility_date": "2026-11-17",
-	"main": "./workers/app.ts",
+	"main": "./src/worker/index.ts",
+	// The browser script, stylesheet, fonts and images (built by `vite build`). Cloudflare serves these files itself,
+	// free and without running the Worker; every other address (the pages) goes to the Worker.
+	"assets": {
+		"directory": "./dist/client"
+	},
 	"vars": {
 		// The site's public address: canonical links, sitemaps and social cards use it.
 		"SITE_URL": "https://liveradio.space"
@@ -22,7 +27,7 @@
 			"migrations_dir": "migrations"
 		}
 	],
-	// The deployed version's id: part of every edge-cache key, so each deploy starts with fresh pages (workers/app.ts).
+	// The deployed version's id: part of every edge-cache key, so each deploy starts with fresh pages (src/worker/index.ts).
 	"version_metadata": {
 		"binding": "CF_VERSION_METADATA"
 	},
@@ -32,7 +37,7 @@
 	"upload_source_maps": true,
 	// The site's own domain (a Cloudflare zone on the Free plan, nameservers damon/paige.ns.cloudflare.com).
 	// Routes, not custom domains: they sit on the zone's existing proxied DNS records. www redirects to the
-	// bare domain in workers/app.ts.
+	// bare domain in src/worker/index.ts.
 	"routes": [
 		{ "pattern": "liveradio.space/*", "zone_name": "liveradio.space" },
 		{ "pattern": "www.liveradio.space/*", "zone_name": "liveradio.space" }

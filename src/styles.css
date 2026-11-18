@@ -1,0 +1,532 @@
+/* Tailwind reads the class names in src/ (templates and browser code). */
+@import "tailwindcss" source(".");
+@import "@fontsource-variable/fraunces/index.css";
+@import "@fontsource-variable/instrument-sans/index.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+/*
+  LiveRadio look: an analog tuning dial in print. Warm paper, black ink, one red needle.
+  Every colour comes from these variables; text pairs are WCAG AA (body ~14:1, muted >= 5:1).
+*/
+:root {
+  --paper: #f3eee3;
+  --paper-2: #e9e2d2;
+  --paper-3: #ddd4c0;
+  --ink: #16130f;
+  --ink-2: #3f392f;
+  --muted: #625a4d;
+  --line: #16130f;
+  --hair: #c9bfa9;
+  --red: #d9381e;
+  --red-ink: #b42d15;
+  --on-red: #ffffff;
+  --bar: #16130f;
+  --on-bar: #f3eee3;
+  --on-bar-muted: #b9b09d;
+  --focus: #1f5fd1;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #15130f;
+    --paper-2: #1f1c17;
+    --paper-3: #2b2720;
+    --ink: #f1ebdd;
+    --ink-2: #d6cebd;
+    --muted: #a99f8c;
+    --line: #f1ebdd;
+    --hair: #4a4337;
+    --red: #ff5a3c;
+    --red-ink: #ff7a5f;
+    --on-red: #15130f;
+    --bar: #0b0a08;
+    --on-bar: #f1ebdd;
+    --on-bar-muted: #a99f8c;
+    --focus: #8fb4ff;
+    color-scheme: dark;
+  }
+}
+
+@theme {
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-hair: var(--hair);
+  --color-red: var(--red);
+  --color-red-ink: var(--red-ink);
+  --color-on-red: var(--on-red);
+  --color-bar: var(--bar);
+  --color-on-bar: var(--on-bar);
+  --color-on-bar-muted: var(--on-bar-muted);
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 100dvh;
+  /* Room for the player bar so it never covers the last row. */
+  padding-bottom: 5.5rem;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  font-variation-settings: "SOFT" 0, "WONK" 0;
+}
+
+.caps {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The frequency scale along the whole dial (light marks on the dark dial window): a fine tick every 6px, a
+   tall one every 36px. It scrolls with the stations (background-attachment: local), so turning the dial moves
+   the scale under the needle. */
+.dial-scale {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--on-bar) 85%, transparent) 1.5px, transparent 1.5px),
+    linear-gradient(to right, color-mix(in srgb, var(--on-bar) 60%, transparent) 1px, transparent 1px);
+  background-size: 36px 24px, 6px 12px;
+  background-position: 0 6px, 0 6px;
+  background-repeat: repeat-x;
+  background-attachment: local;
+}
+
+/* Station logos: a printed frame; a failed logo leaves the station's initials behind it. */
+.logo-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  flex: none;
+}
+.logo-frame > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+.logo-frame > img[data-broken] {
+  display: none;
+}
+/* While a logo loads, its frame pulses like the other skeletons. */
+.logo-frame:has(> img:not([data-loaded])) {
+  animation: skeleton 0.8s ease-in-out infinite alternate;
+}
+.logo-frame > img:not([data-loaded]) {
+  background: transparent;
+}
+
+/* Loading placeholders (v1 pulsed its loading cards the same way). */
+.skeleton {
+  background: var(--paper-3);
+  animation: skeleton 0.8s ease-in-out infinite alternate;
+}
+@keyframes skeleton {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.45;
+  }
+}
+
+/* The playing indicator: three bars, still when the visitor prefers less motion. */
+.eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.eq > i {
+  width: 3px;
+  background: currentColor;
+  animation: eq 0.9s ease-in-out infinite;
+  height: 40%;
+}
+.eq > i:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.eq > i:nth-child(3) {
+  animation-delay: -0.6s;
+}
+@keyframes eq {
+  0%,
+  100% {
+    height: 30%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq > i {
+    animation: none;
+    height: 70%;
+  }
+  .skeleton,
+  .logo-frame:has(> img:not([data-loaded])) {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Parts the browser script switches with attributes (src/client/sync.ts) ------------------------------------ */
+
+/* Icons point at the drawings in the page's sprite; they take the text colour. */
+.icon {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Menu entries. The current section is ink on paper; hovering it keeps it that way (it used to turn the text the
+   same colour as its background and vanish). */
+.nav-link {
+  transition: background-color 0.15s;
+}
+.nav-link:hover {
+  background: var(--paper-2);
+}
+.nav-link[aria-current="page"],
+.nav-link[aria-current="page"]:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-link {
+    transition: none;
+  }
+}
+
+/* The mobile menu button shows the menu icon, or a cross while the menu is open. */
+[data-menu] .menu-close,
+[data-menu][aria-expanded="true"] .menu-open {
+  display: none;
+}
+[data-menu][aria-expanded="true"] .menu-close {
+  display: inline;
+}
+
+/* Play buttons: a play icon, a pause icon while this station plays, a spinner while it tunes in. */
+.play-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--red);
+  color: var(--on-red);
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+  z-index: 10;
+}
+.play-btn:hover {
+  transform: scale(1.05);
+}
+.play-btn:active {
+  transform: scale(0.95);
+}
+.play-md {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+.play-lg {
+  width: 4rem;
+  height: 4rem;
+}
+.play-btn .i-play {
+  translate: 1px 0;
+}
+.play-btn .i-pause,
+.play-btn .i-busy,
+.bar-play .i-pause,
+.bar-play .i-busy,
+.play-btn[data-state="playing"] .i-play,
+.play-btn[data-state="loading"] .i-play,
+.bar-play[data-state="playing"] .i-play,
+.bar-play[data-state="loading"] .i-play {
+  display: none;
+}
+.play-btn[data-state="playing"] .i-pause,
+.bar-play[data-state="playing"] .i-pause,
+.play-btn[data-state="loading"] .i-busy,
+.bar-play[data-state="loading"] .i-busy {
+  display: block;
+}
+
+/* Favourite hearts: outlined, filled red when the station is a favourite. */
+.fav-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.fav-btn:hover {
+  background: var(--paper-3);
+}
+.fav-btn[aria-pressed="true"] {
+  color: var(--red);
+  --heart-fill: var(--red);
+}
+
+/* Station cards. The station's name link covers the whole card; the buttons sit above it. */
+.station-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--paper);
+  padding: 0.75rem;
+  transition: background-color 0.15s;
+}
+.station-card:hover {
+  background: var(--paper-2);
+}
+.station-card[data-current] {
+  box-shadow: inset 0 0 0 2px var(--red);
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.card-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.station-card:hover .card-link {
+  text-decoration: underline;
+}
+.card-meta {
+  margin-top: 0.25rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+}
+.card-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.card-fav {
+  position: relative;
+  z-index: 10;
+  margin: 0 -0.5rem -0.5rem 0;
+}
+/* "On air" with moving bars replaces the listener count while the card's station plays. */
+.on-air {
+  display: none;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--red-ink);
+}
+.station-card[data-playing] .on-air {
+  display: inline-flex;
+}
+.station-card[data-playing] .listens {
+  display: none;
+}
+
+/* The home page dial: the country under the needle is lit. */
+.dial-item .dial-freq {
+  color: var(--on-bar-muted);
+}
+.dial-item .dial-code {
+  border-color: var(--on-bar-muted);
+  color: var(--on-bar);
+}
+.dial-item .dial-name {
+  color: var(--on-bar-muted);
+}
+.dial-item[data-active] .dial-freq {
+  color: var(--red);
+}
+.dial-item[data-active] .dial-code {
+  border-color: var(--red);
+  background: var(--red);
+  color: var(--on-red);
+}
+.dial-item[data-active] .dial-name {
+  color: var(--on-bar);
+}
+
+/* The thin bar at the top while the next page loads (shown only when it takes longer than 150 ms). */
+#progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: 3px;
+  background: var(--red);
+  transform-origin: left;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+}
+#progress[data-active] {
+  opacity: 1;
+  animation: progress 8s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+@keyframes progress {
+  from {
+    transform: scaleX(0.05);
+  }
+  to {
+    transform: scaleX(0.92);
+  }
+}
+
+/* Player bar buttons. */
+.bar-btn {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  color: var(--on-bar);
+}
+.bar-btn:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+.bar-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.bar-play {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: var(--red);
+  color: var(--on-red);
+  cursor: pointer;
+}
+.bar-fav {
+  color: var(--on-bar);
+}
+.bar-fav[aria-pressed="true"] {
+  color: var(--red);
+  --heart-fill: var(--red);
+}
+[data-bar="mute"] .vol-off,
+[data-bar="mute"][data-muted="true"] .vol-on {
+  display: none;
+}
+[data-bar="mute"][data-muted="true"] .vol-off {
+  display: inline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-btn,
+  .station-card {
+    transition: none;
+  }
+  .play-btn:hover,
+  .play-btn:active {
+    transform: none;
+  }
+  #progress[data-active] {
+    animation: none;
+  }
+  #progress[data-active] {
+    transform: scaleX(0.6);
+  }
+}
+
+/* Range input for the volume, in the bar's colours. */
+input[type="range"].volume {
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--on-bar) var(--level, 80%), var(--on-bar-muted) var(--level, 80%));
+  cursor: pointer;
+}
+input[type="range"].volume::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--on-bar);
+  border: 2px solid var(--bar);
+}
+input[type="range"].volume::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--on-bar);
+  border: 2px solid var(--bar);
+}

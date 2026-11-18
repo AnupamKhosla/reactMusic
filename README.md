@@ -1,18 +1,58 @@
-# LiveRadio (v2)
+# LiveRadio (v3, light)
 
 Live radio from every country, free in the browser: https://liveradio.space
 
-v2 replaces the one-page React app (everything behind `?search=…&filter=…&page=…`) with a server-rendered
-site where every country, genre, language and station has its own address, plus a private visitor dashboard.
+v3 (branch `v3-light`, 18–19 Nov 2026) keeps every page and address of v2 but drops React and React Router: the
+pages are plain template functions that build HTML strings, run by the Worker for direct visits and by the browser
+for pages opened inside the site. Why: v2 needed 15–45 ms of Worker CPU per fresh page against the free plan's
+10 ms, and Cloudflare stopped thousands of requests a day (18 Nov). v3 builds a page in 0.04–0.2 ms (3 ms for the
+very first page of a new Worker instance), measured on the Mac with `npm run bench`.
 
-## What changed from v1
+## How v3 works
+
+```
+src/shared/   templates for every page (html.ts, ui.ts, layout.ts, pages/*), the address table (router.ts),
+              the station directory client (radio.ts), SEO tags (seo.ts). Runs in the Worker AND the browser.
+src/worker/   the Worker: pages, edge cache, sitemaps, robots.txt, /api/collect, /dashboard (index.ts)
+src/client/   the browser script: page changes inside the site, player, favourites, dial (main.ts)
+src/styles.css
+```
+
+- **Direct visit (address typed, link from Google, reload):** the Worker matches the address (`router.ts`), asks
+  the directory for the data, fills the page's template and sends finished HTML with every SEO tag. The page
+  carries `<script id="lr-state">` with `"rendered": "server"`, the stations on it and when it was built.
+- **The browser script** sees `"server"` and leaves the content alone (no React-style "hydration": it doesn't
+  rebuild anything). It only adds one click listener and sets attributes for this visitor: which station plays,
+  which hearts are filled (`sync.ts`).
+- **Clicking a link inside the site:** the browser asks the directory for the next page's data itself (the Worker
+  is not involved), builds the page with the same templates, and only then changes the address (History API) and
+  shows it. Meanwhile the current page stays and a thin red bar shows after 150 ms. Back/Forward show pages seen
+  in the last 5 minutes at once. The document is never reloaded, so the player keeps playing (`nav.ts`).
+- **Errors everywhere:** a directory that doesn't answer gives the "station list is busy" page (503, never
+  cached, with Try again); unknown addresses give a real 404; redirects (old v1 addresses, renamed stations) are
+  301s on the Worker and `replaceState` in the browser; a page that takes over 12 s counts as busy.
+- **Caching (like Next.js incremental static regeneration):** the Worker keeps each page in Cloudflare's edge
+  cache. A copy younger than its `s-maxage` (10 min for lists, a day for fixed pages) is served as it is; an older
+  one is still served at once, and the Worker rebuilds it in the background for the next visitor
+  (`cached()` in `src/worker/index.ts`). Each deploy starts a fresh cache (the key holds the version).
+  Backstop in the browser: a page more than 10 minutes old is rebuilt there in the background and only the parts
+  that changed are updated (`morph.ts`); if nothing changed, nothing moves.
+- **Plain hosting without a Worker** (GitHub Pages or any file server): `npm run build:static` writes `dist/static`
+  with the same script and an empty frame as `index.html` and `404.html` (`"rendered": "shell"`). The browser
+  then builds whatever page the address names, showing a skeleton only if that takes over 500 ms. Limits there:
+  crawlers that don't run JavaScript see an empty page, deep addresses answer with HTTP 404 (the page still
+  shows), and there's no visit counting or dashboard. Test it with `node scripts/serve-static.ts`.
+- Static files (script, stylesheet, fonts, icons, manifest) are Cloudflare static assets: free and never run the
+  Worker. The browser script is 27 KB compressed; hls.js (180 KB) loads only for HLS stations.
+
+## What v2 changed from v1 (still true)
 
 - **Real pages, rendered on the server.** `/country/india`, `/genre/jazz`, `/language/hindi`,
   `/station/<name>-<id>`, `/top`, `/countries`, `/genres`, `/languages`, `/search?q=`, `/favorites`, `/about`,
   `/privacy`. Search engines get finished HTML with a title, description, canonical link, Open Graph/Twitter
   tags and JSON-LD (WebSite, BreadcrumbList, ItemList, RadioStation) on every page.
-- **History API navigation.** Moving between pages never reloads the document (React Router), so the player
-  keeps playing. Back/forward, bookmarks and shared links all work.
+- **History API navigation.** Moving between pages never reloads the document, so the player keeps playing.
+  Back/forward, bookmarks and shared links all work.
 - **One persistent player** at the bottom: play/pause, previous/next through the list it was started from,
   favourite, volume, lock-screen and headphone controls (Media Session), HLS streams, plain error messages.
 - **Favourites and recently played** stay in the visitor's browser (no account).
@@ -39,33 +79,31 @@ site where every country, genre, language and station has its own address, plus 
 npm install
 cp .dev.vars.example .dev.vars      # local dashboard password
 npm run db:local                    # creates the local stats tables
-npm run dev                         # http://localhost:5173
+npm run dev                         # builds the browser script, then http://localhost:8787 (no edge cache)
 ```
+
+(`npm run dev` doesn't rebuild the browser script on changes: run `npm run build` again, or `npx vite build
+--watch` in a second terminal.)
 
 Checks:
 
 ```sh
-npm run typecheck
-bash scripts/smoke.sh http://localhost:5173        # every page type: status, title, canonical
-node scripts/nav-check.mjs http://localhost:5173   # no reloads between pages, player keeps playing
-node scripts/dial-check.mjs http://localhost:5173  # dial drag/click/keys, card links, back button, skeletons
-node scripts/shots.mjs http://localhost:5173       # headless screenshots into .smoke/
+npm run typecheck                                  # browser + shared code, then the Worker (two configs)
+npm run bench                                      # page build time and HTML size on this Mac
+bash scripts/smoke.sh http://localhost:8787        # every page type: status, title, canonical
+npm run build:static && node scripts/serve-static.ts   # the no-Worker version on http://localhost:8788
 node scripts/contrast.mjs                          # WCAG 2.2 contrast of every colour pair, both schemes
 node scripts/cpu-check.mjs https://liveradio.space # live CPU ms per page (reads `wrangler tail`)
-npm run preview                                    # the production build in the Workers runtime
 ```
 
-(The browser scripts need the `playwright` package; they run headless.)
+(`smoke.sh` asks for `/dashboard` as curl, which the Worker answers with 404 on purpose; it opens in a browser.
+`nav-check.mjs`, `dial-check.mjs` and `shots.mjs` were written for v2 and need the `playwright` package.)
 
-## How it works
+## Data and storage
 
-- React Router 8 (framework mode, SSR) on a Cloudflare Worker (`workers/app.ts`), built with Vite.
-- Station data: the free, community-run Radio Browser directory, read on the server only
-  (`app/lib/radio.server.ts`). Its mirrors are discovered at run time; answers are cached at the edge
-  (`cf.cacheTtl`) and in memory.
-- Pages are cached at Cloudflare's edge for 10 minutes (lists) or a day (static pages); the cache key holds the
-  build version, so a deploy never serves pages that point at old scripts. The edge cache only works on the
-  custom domain, not on `*.workers.dev`.
+- Station data: the free, community-run Radio Browser directory (`src/shared/radio.ts`), read by the Worker and,
+  for pages opened inside the site, by the visitor's browser (it allows that). Its mirrors are discovered at run
+  time; the Worker's requests are cached by Cloudflare (`cf.cacheTtl`) and both keep answers in memory.
 - Stats: Cloudflare D1 (SQLite), tables in `migrations/0001_stats.sql`.
 
 ## The visitor dashboard (`/dashboard`)
@@ -114,7 +152,7 @@ State on 2026-11-17:
 ### Sitemap stages (owner, 2026-11-17)
 
 Google gets the site in steps, so a new domain with thousands of look-alike station pages isn't taken for spam:
-the main pages first, more only once most of them are indexed. `SITEMAP_STAGE` in `app/lib/sitemap.server.ts`
+the main pages first, more only once most of them are indexed. `SITEMAP_STAGE` in `src/worker/sitemap.ts`
 decides what `/sitemap.xml` lists:
 
 | Stage | `/sitemap.xml` lists | About |

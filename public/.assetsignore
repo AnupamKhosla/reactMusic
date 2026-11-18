@@ -1,0 +1,3 @@
+# Build files that are not part of the website (the Worker reads the manifest when it is bundled).
+.vite
+.assetsignore

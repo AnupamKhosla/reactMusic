@@ -1,0 +1,17 @@
+// The Worker and the shared templates it runs, with Cloudflare's runtime types (worker-configuration.d.ts) and no DOM.
+{
+  "include": ["src/worker/**/*", "src/shared/**/*", "worker-configuration.d.ts"],
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2022"],
+    "types": [],
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  }
+}
