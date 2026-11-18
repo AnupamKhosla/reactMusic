@@ -2,6 +2,19 @@
 
 Newest first. Status: open / done / waiting (on the owner).
 
+## 2026-11-18 (night IST) — a static site, not pages built on every visit
+
+Owner, after the Workers CPU email (GPTBot crawling thousands of station pages, each rendered fresh by the Worker):
+"all the website should have been static front end react code, for ssr and seo we could have had prerendered all
+possible pages locally in our mac and create a build or something. soon google gonna crawl our pages too."
+- open (plan waiting for the owner's OK): pages are built ahead of time into plain files that Cloudflare serves
+  without running the Worker (free, unlimited); the Worker only keeps the visit counter and the dashboard. Free
+  plan limit: 20,000 files per deploy, so the main pages plus the ~15,000 most-listened stations as files; the rest
+  of the station pages are built in the visitor's browser from one shared file. A rebuild refreshes the data.
+- done: the project moved out of `chess-ai/tmp/` to its own folder, `~/Desktop/Projects/liveradio`.
+- done (live 18 Nov): username + password on /dashboard; WAF rules (dashboard human check, scanner/probe block);
+  GPTBot and `?sort=` copies out of robots.txt; login cookie fix.
+
 ## 2026-11-17 (after go-live) — for later, not bugs
 
 Owner: "not a bug no light theme and the design is typical opus styling not original. we will fix these later just

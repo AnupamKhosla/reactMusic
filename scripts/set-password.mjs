@@ -1,5 +1,5 @@
 // Sets (or changes) the /dashboard username and password on the live site.
-// Usage: npm run set-password   (from the chess-ai folder: npm --prefix tmp/liveradio run set-password)
+// Usage: npm run set-password   (from elsewhere: npm --prefix ~/Desktop/Projects/liveradio run set-password)
 //
 // Mac dialogs ask for the username, then the password twice (typing hidden). Both go straight to Cloudflare as the
 // Worker's STATS_USERNAME and STATS_PASSWORD secrets: never printed, saved to a file or put in the repo. Changing
