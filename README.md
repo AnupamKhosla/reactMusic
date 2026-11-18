@@ -147,6 +147,17 @@ allowed) and `?sort=` copies for every crawler; the Worker answers scanner names
 before any rendering; /dashboard returns 404 to crawlers and isn't named in robots.txt. Figures came from the
 dashboard's GraphQL analytics (`workersInvocationsAdaptive`, zone `httpRequestsAdaptiveGroups` by userAgent).
 
+Cloudflare WAF custom rules on the zone (Free plan, 2 of 5; added 18 Nov 2026 with the owner's yes). They run before
+the Worker, so whatever they stop costs no Worker requests or CPU. Security → Security rules, or the
+`http_request_firewall_custom` entrypoint ruleset. To rebuild them:
+1. "Owner dashboard: human check before the Worker runs": Managed Challenge when
+   `starts_with(lower(http.request.uri.path), "/dashboard")`.
+2. "Block vulnerability scanners and config-file probes": Block when the user agent contains TLM-Audit-Scanner,
+   CMS-Security-Auditor, zgrab, sqlmap, nikto or Nuclei, or the lower-cased path ends with .env .php .yml .yaml .toml
+   .ini .sql .bak .old .log .cfg .conf .config .asp .aspx .jsp .cgi .csv .zip .gz .tar .rar .pem .key .sh .py .json,
+   or contains /.git /.env /.aws /.ssh phpmyadmin, or starts with /wp- /cgi-bin /vendor/ /node_modules.
+   (Free plans have no regex in rules, hence the long `or` list.)
+
 ## Known limits
 
 - Some stations stream only over plain `http://`, which browsers block on an `https` page. The player tries
