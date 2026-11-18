@@ -49,9 +49,12 @@ export async function login(request: Request, attempt: string): Promise<string |
     return null;
   }
   const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
-  return `${COOKIE}=${await token(password())}; Path=/dashboard; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}${secure}`;
+  // Path=/ and not /dashboard: the page loads its data from /dashboard.data, which a /dashboard cookie path does
+  // not cover (the next character must be "/"), so the password seemed wrong after every login (18 Nov 2026).
+  return `${COOKIE}=${await token(password())}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${60 * 60 * 24 * 60}${secure}`;
 }
 
-export function logoutCookie(): string {
-  return `${COOKIE}=; Path=/dashboard; HttpOnly; SameSite=Strict; Max-Age=0`;
+/** Clears the login cookie (and the old one scoped to /dashboard, from before 18 Nov 2026). */
+export function logoutCookies(): string[] {
+  return [`${COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`, `${COOKIE}=; Path=/dashboard; HttpOnly; SameSite=Strict; Max-Age=0`];
 }

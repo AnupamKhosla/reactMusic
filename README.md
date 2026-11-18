@@ -138,6 +138,15 @@ Cloudflare let every one of them through (outcome "ok"); it tolerates occasional
 that is over the limit all the time with error 1102. The edge cache keeps most visits at 0–1 ms. If 1102 errors
 ever show up in the Worker's logs, the cure is rendering less per page (or the paid plan, the owner's call).
 
+18 Nov 2026: Cloudflare's "Workers CPU limit exceeded" email (1,000+ a day). Last 24 h: 32,708 Worker requests,
+2,931 stopped for CPU (9%, mostly `?sort=` list pages). By user agent: GPTBot 26,440 (77%, nearly all distinct
+`/station/…` pages, so every one missed the edge cache and was rendered fresh), a config-file scanner from NL
+(`TLM-Audit-Scanner`) 4,292 probing `.env`/`.php`/`.json` paths that each rendered the full 404 page, AhrefsBot
+1,316, and only a few hundred people. Fixes: robots.txt shuts out GPTBot (OAI-SearchBot and ChatGPT-User stay
+allowed) and `?sort=` copies for every crawler; the Worker answers scanner names and probe paths with a plain 404/403
+before any rendering; /dashboard returns 404 to crawlers and isn't named in robots.txt. Figures came from the
+dashboard's GraphQL analytics (`workersInvocationsAdaptive`, zone `httpRequestsAdaptiveGroups` by userAgent).
+
 ## Known limits
 
 - Some stations stream only over plain `http://`, which browsers block on an `https` page. The player tries

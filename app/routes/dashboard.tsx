@@ -3,7 +3,7 @@ import { data, Form, Link, redirect, useNavigation } from "react-router";
 import type { Route } from "./+types/dashboard";
 import { CountMeToggle } from "~/components/CountMeToggle";
 import { Container } from "~/components/ui";
-import { hasPassword, isOwner, login, logoutCookie } from "~/lib/auth.server";
+import { hasPassword, isOwner, login, logoutCookies } from "~/lib/auth.server";
 import { countryName } from "~/lib/names";
 import { loadDashboard, type Dashboard, type Kpis, type Row } from "~/lib/stats.server";
 
@@ -33,7 +33,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action({ request }: Route.ActionArgs) {
   const form = await request.formData();
-  if (form.get("intent") === "logout") return redirect("/dashboard", { headers: { "Set-Cookie": logoutCookie() } });
+  if (form.get("intent") === "logout") {
+    const headers = new Headers();
+    for (const cookie of logoutCookies()) headers.append("Set-Cookie", cookie);
+    return redirect("/dashboard", { headers });
+  }
   const cookie = await login(request, String(form.get("password") ?? ""));
   if (!cookie) return data({ error: "That password is not right." }, { status: 401 });
   return redirect("/dashboard", { headers: { "Set-Cookie": cookie } });

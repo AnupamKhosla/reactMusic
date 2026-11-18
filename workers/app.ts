@@ -9,6 +9,20 @@ const NEVER_CACHE = /^\/(api\/collect|dashboard)/;
 // Ad and campaign tags don't change the page: one cached copy serves them all.
 const IGNORED_PARAMS = /^(utm_[a-z]+|fbclid|gclid|msclkid|ref)$/;
 
+// Scanners probing for config files, backups and admin pages (18 Nov 2026: one sent ~4,300 a day). None of these
+// exist here, so they get a plain 404 without rendering the site's 404 page, which costs real CPU time.
+const PROBE =
+  /(^|\/)\.(?!well-known\/)|\.(php\d?|env|ini|ya?ml|toml|sql|bak|old|orig|swp|log|cfg|conf|config|aspx?|jsp|cgi|csv|zip|gz|tgz|tar|rar|7z|json|map|sh|py|rb|pem|key)$|^\/(wp-|wordpress|phpmyadmin|cgi-bin|vendor|node_modules)/i;
+// Scanner names seen in the logs; they never get a page.
+const SCANNERS = /TLM-Audit-Scanner|CMS-Security-Auditor|zgrab|masscan|nuclei|sqlmap|nikto|Nmap/i;
+
+function plain(status: number): Response {
+  return new Response(status === 404 ? "Not found" : "Forbidden", {
+    status,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=86400", "X-Robots-Tag": "noindex" },
+  });
+}
+
 // Every cache key carries the deployed version, so a new deploy never serves a page cached by the previous one:
 // not its old scripts (the browser build's version) and not its old server output (Cloudflare's id for each
 // deploy; the browser build's version alone stays the same when only server code changes).
@@ -44,11 +58,16 @@ export default {
     }
 
     const ua = request.headers.get("User-Agent") || "";
+    if (SCANNERS.test(ua)) return plain(403);
+    if (PROBE.test(url.pathname)) return plain(404);
+
+    const bot = crawlerName(ua);
+    // The visitor dashboard is for the owner only: crawlers, scripts without a browser name and anything else that
+    // calls itself a bot are told it doesn't exist (robots.txt doesn't name it, so it isn't advertised either).
+    if (url.pathname.startsWith("/dashboard") && (bot || !/^Mozilla\//.test(ua))) return plain(404);
+
     const isPage = request.method === "GET" && !url.pathname.startsWith("/api/") && !url.pathname.endsWith(".data");
-    if (isPage) {
-      const bot = crawlerName(ua);
-      if (bot) ctx.waitUntil(recordCrawl(env.DB, bot).catch(() => {}));
-    }
+    if (isPage && bot) ctx.waitUntil(recordCrawl(env.DB, bot).catch(() => {}));
 
     const cacheable =
       !import.meta.env.DEV && request.method === "GET" && !NEVER_CACHE.test(url.pathname) && !request.headers.has("Authorization");
