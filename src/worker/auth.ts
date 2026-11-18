@@ -29,19 +29,23 @@ function sameText(a: string, b: string): boolean {
   return diff === 0;
 }
 
-function readCookie(request: Request, name: string): string {
+/** Every value of a cookie: a browser can hold several with the same name (different paths) and sends them all. */
+function readCookies(request: Request, name: string): string[] {
   const header = request.headers.get("Cookie") || "";
+  const values: string[] = [];
   for (const part of header.split(";")) {
     const [k, ...v] = part.trim().split("=");
-    if (k === name) return v.join("=");
+    if (k === name) values.push(v.join("="));
   }
-  return "";
+  return values;
 }
 
 export async function isOwner(request: Request): Promise<boolean> {
   if (!hasPassword()) return false;
-  const value = readCookie(request, COOKIE);
-  return value.length > 0 && sameText(value, await token(password()));
+  const expected = await token(password());
+  // Checking only the first value failed: an old lr_stats cookie scoped to /dashboard (before 18 Nov 2026) is sent
+  // first, so a correct login came straight back to the login form (19 Nov 2026).
+  return readCookies(request, COOKIE).some((value) => value.length > 0 && sameText(value, expected));
 }
 
 /** Returns the Set-Cookie header for a correct username and password, or null. */

@@ -179,6 +179,8 @@ export async function dashboard(request: Request, db: D1Database): Promise<Dashb
     }
     const cookie = await login(request, String(form.get("username") ?? ""), String(form.get("password") ?? ""));
     if (!cookie) return { type: "page", status: 401, body: frame(loginForm("That username or password is not right.")) };
+    // Also clear the old cookie scoped to /dashboard, so it can't shadow the new one.
+    headers.append("Set-Cookie", logoutCookies()[1]);
     headers.append("Set-Cookie", cookie);
     return { type: "redirect", headers };
   }

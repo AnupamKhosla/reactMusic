@@ -2,6 +2,8 @@
 // runtime types and the browser's DOM types define some of the same names differently.
 {
   "include": ["src/client/**/*", "src/shared/**/*", "scripts/**/*.ts"],
+  // cold-cpu.ts imports Worker code, so it can't be checked with the DOM types; it runs only on the Mac.
+  "exclude": ["scripts/cold-cpu.ts"],
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
