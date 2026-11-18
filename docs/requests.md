@@ -11,6 +11,20 @@ possible pages locally in our mac and create a build or something. soon google g
   without running the Worker (free, unlimited); the Worker only keeps the visit counter and the dashboard. Free
   plan limit: 20,000 files per deploy, so the main pages plus the ~15,000 most-listened stations as files; the rest
   of the station pages are built in the visitor's browser from one shared file. A rebuild refreshes the data.
+  Plan approved 18 Nov (`~/.claude/plans/synthetic-sprouting-gadget.md`); adjustments found while reading React
+  Router 8: page 2+ and `?sort=` can't be files (the query string isn't part of a file name), so only page 1 of each
+  list is prerendered; addresses that aren't files get the empty shell from a tiny Worker step (~0.3 ms), because
+  Cloudflare's own SPA fallback would serve the home page's HTML. Owner then: "see if you can make worker more
+  efficient e.g. by changing backend programming lang to rust golang etc. or before implementing wait for me to come
+  back" → waiting for the owner; nothing built yet.
+- open (owner, later 18 Nov; replaces the 19k-files idea, waiting for the owner's go): drop React for light code.
+  A direct page load: the Worker gets the radio API data and fills plain JS templates into the finished HTML (for
+  Google and first visits). Clicks inside the site: the browser fetches the radio API itself (no Worker), waits for
+  the data, then changes the address and draws the page; no skeleton-first, no address change before the data
+  ("don't do that"). Owner: "the navigation should be happening in web app not like a php page load". The CPU of
+  the template version must be measured on the Mac before any claim. Proper error handling everywhere in the code.
+- bug (owner, 18 Nov): in the top menu, hovering the current (active) tab makes it invisible.
+- note (owner, 18 Nov): the radio API answers in ~50–300 ms; direct loads like /country/finland feel instant.
 - done: the project moved out of `chess-ai/tmp/` to its own folder, `~/Desktop/Projects/liveradio`.
 - done (live 18 Nov): username + password on /dashboard; WAF rules (dashboard human check, scanner/probe block);
   GPTBot and `?sort=` copies out of robots.txt; login cookie fix.
